@@ -2,18 +2,18 @@
 <resources>
 
     <string name="app_name">MyFirstApp</string>
+    <string name="title_activity_display_message">My Message!!!</string>
+    <string name="title_activity_record_counter">RecordCounterActivity</string>
+    <string name="title_activity_new_meter">NewMeterActivity</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world 2!</string>
     <string name="button_send">Send now!</string>
-    <string name="title_activity_display_message">My Message!!!</string>
     <string name="edit_message">This is the Edit Message</string>
-    <string name="title_activity_record_counter">RecordCounterActivity</string>
     <string name="recordText">record</string>
     <string name="meterSnapshot">meter snapshot</string>
     <string name="lightSwitchText">Light</string>
     <string name="meterSnapshotCamera">take snapshot</string>
     <string name="meterSnapshotActiveArea">active area</string>
-    <string name="title_activity_new_meter">NewMeterActivity</string>
     <string name="counter_name_label">Meter name</string>
     <string name="counter_ID_label">Meter ID</string>
     <string name="counter_type_label">Meter type</string>

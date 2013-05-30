@@ -14,13 +14,23 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="de.franken.fermi.myfirstapp.MainActivity"
-            android:label="@string/app_name" >
+            android:name="de.franken.fermi.myfirstapp.RecordCounterActivity"
+            android:label="@string/title_activity_record_counter" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="de.franken.fermi.myfirstapp.NewMeterActivity"
+            android:label="@string/title_activity_new_meter" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.franken.fermi.myfirstapp.NewMeterActivity" />
+        </activity>
+        <activity
+            android:name="de.franken.fermi.myfirstapp.MainActivity"
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name="de.franken.fermi.myfirstapp.DisplayMessageActivity"
@@ -29,14 +39,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.franken.fermi.myfirstapp.MainActivity" />
-        </activity>
-        <activity
-            android:name="de.franken.fermi.myfirstapp.RecordCounterActivity"
-            android:label="@string/title_activity_record_counter" >
-        </activity>
-        <activity
-            android:name="de.franken.fermi.myfirstapp.NewMeterActivity"
-            android:label="@string/title_activity_new_meter" >
         </activity>
     </application>
 
