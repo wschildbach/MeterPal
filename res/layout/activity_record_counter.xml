@@ -26,7 +26,7 @@
             android:singleLine="true"
             android:text="Gaszähler" />
 
-	    <EditText android:id="@+id/MeterID" android:layout_width="100dp" android:layout_height="wrap_content" android:ems="10" android:inputType="none" android:singleLine="true" android:text="#12345" />
+	    <EditText android:id="@+id/MeterID" android:layout_width="100dp" android:layout_height="wrap_content" android:ems="10" android:inputType="none" android:singleLine="true" android:text="...7054" />
         
         
         </LinearLayout>
@@ -91,12 +91,6 @@
         android:contentDescription="@string/meterSnapshot"
         android:src="@drawable/img_gasmeter" />
 
-    <CheckBox
-        android:id="@+id/lightSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/lightSwitchText" />
-
     <ImageButton
         android:id="@+id/cameraButton"
         android:layout_width="wrap_content"
@@ -106,13 +100,20 @@
         android:src="@android:drawable/ic_menu_camera" />
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/activeArea"
         android:layout_width="100dp"
         android:layout_height="96dp"
         android:layout_gravity="center"
         android:contentDescription="@string/meterSnapshotActiveArea"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_activearea" />
+
+    <ImageButton
+        android:id="@+id/lightBulbButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|top"
+        android:src="@drawable/ic_lightbulb" />
 
     </FrameLayout>
 
