@@ -10,5 +10,8 @@
     <string name="title_activity_record_counter">RecordCounterActivity</string>
     <string name="recordText">record</string>
     <string name="meterSnapshot">meter snapshot</string>
+    <string name="lightSwitchText">Light</string>
+    <string name="meterSnapshotCamera">take snapshot</string>
+    <string name="meterSnapshotActiveArea">active area</string>
     
 </resources>
