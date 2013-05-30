@@ -13,5 +13,10 @@
     <string name="lightSwitchText">Light</string>
     <string name="meterSnapshotCamera">take snapshot</string>
     <string name="meterSnapshotActiveArea">active area</string>
+    <string name="title_activity_new_meter">NewMeterActivity</string>
+    <string name="counter_name_label">Meter name</string>
+    <string name="counter_ID_label">Meter ID</string>
+    <string name="counter_type_label">Meter type</string>
+    <string name="menu_done">Done</string>
     
 </resources>

@@ -34,6 +34,10 @@
             android:name="de.franken.fermi.myfirstapp.RecordCounterActivity"
             android:label="@string/title_activity_record_counter" >
         </activity>
+        <activity
+            android:name="de.franken.fermi.myfirstapp.NewMeterActivity"
+            android:label="@string/title_activity_new_meter" >
+        </activity>
     </application>
 
 </manifest>
