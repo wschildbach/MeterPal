@@ -9,14 +9,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".RecordCounterActivity" >
 
-   <LinearLayout android:id="@+id/linearLayout1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignRight="@+id/linearLayout1">
-
-        <ImageButton
-            android:id="@+id/newMeterButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="newMeter"
-            android:src="@android:drawable/ic_input_add" />
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/linearLayout1" >
 
         <TextView
             android:id="@+id/MeterName"
@@ -25,17 +22,18 @@
             android:ems="10"
             android:inputType="none"
             android:singleLine="true"
-            android:text="Gaszähler" />
+            android:text="Gaszähler"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-	    <TextView android:id="@+id/MeterID"
-	         android:layout_width="wrap_content"
-	          android:layout_height="wrap_content"
-	           android:ems="10"
-	            android:singleLine="true"
-	             android:text="...7054" />
-        
-        
-        </LinearLayout>
+        <TextView
+            android:id="@+id/MeterID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:singleLine="true"
+            android:text="...7054"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </LinearLayout>
 
     <EditText
         android:id="@+id/meterTakenValue"
@@ -60,7 +58,7 @@
         android:layout_toRightOf="@+id/meterTakenValue"
         android:text="@string/recordText" />
 
-    <EditText
+    <TextView
         android:id="@+id/meterTakenDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -68,10 +66,10 @@
         android:layout_below="@+id/meterTakenValue"
         android:ems="10"
         android:inputType="date"
-        android:text="05/23/2013" >
-</EditText>
+        android:text="05/23/2013"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <EditText
+    <TextView
         android:id="@+id/meterTakenTime"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
@@ -80,47 +78,45 @@
         android:layout_toRightOf="@+id/meterTakenDate"
         android:ems="10"
         android:inputType="time"
-        android:text="11:14" />
-    
+        android:text="11:14"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/meterTakenTime"
-         >
+        android:layout_below="@+id/meterTakenTime" >
 
-    <ImageView
-        android:id="@+id/meterSnapshot"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="fill_vertical"
-        android:contentDescription="@string/meterSnapshot"
-        android:src="@drawable/img_gasmeter" />
+        <ImageView
+            android:id="@+id/meterSnapshot"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="fill_vertical"
+            android:contentDescription="@string/meterSnapshot"
+            android:src="@drawable/img_gasmeter" />
 
-    <ImageButton
-        android:id="@+id/cameraButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:contentDescription="@string/meterSnapshotCamera"
-        android:src="@android:drawable/ic_menu_camera" />
+        <ImageButton
+            android:id="@+id/cameraButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="@string/meterSnapshotCamera"
+            android:src="@android:drawable/ic_menu_camera" />
 
-    <ImageView
-        android:id="@+id/activeArea"
-        android:layout_width="100dp"
-        android:layout_height="96dp"
-        android:layout_gravity="center"
-        android:contentDescription="@string/meterSnapshotActiveArea"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_activearea" />
+        <ImageView
+            android:id="@+id/activeArea"
+            android:layout_width="100dp"
+            android:layout_height="96dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/meterSnapshotActiveArea"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_activearea" />
 
-    <ImageButton
-        android:id="@+id/lightBulbButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center|top"
-        android:src="@drawable/ic_lightbulb" />
-
+        <ImageButton
+            android:id="@+id/lightBulbButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|top"
+            android:src="@drawable/ic_lightbulb" />
     </FrameLayout>
 
 </RelativeLayout>

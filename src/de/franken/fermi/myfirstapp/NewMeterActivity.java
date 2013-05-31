@@ -2,7 +2,10 @@ package de.franken.fermi.myfirstapp;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.view.Menu;
+import android.view.View;
+import android.widget.EditText;
 
 public class NewMeterActivity extends Activity {
 
@@ -18,5 +21,17 @@ public class NewMeterActivity extends Activity {
 		getMenuInflater().inflate(R.menu.new_meter, menu);
 		return true;
 	}
+
+    /** Called when the user clicks the Done button */
+    public void newMeterDone(View view) {
+    	Intent intent = new Intent(this, RecordCounterActivity.class); // Call the RecordCounter intent
+
+    	EditText editText = (EditText) findViewById(R.id.counter_ID);
+    	String message = editText.getText().toString();
+    	intent.putExtra(RecordCounterActivity.EXTRA_MESSAGE, message);
+
+    	startActivity(intent); 
+    }
+
 
 }

@@ -32,6 +32,7 @@ public final class R {
         public static final int MeterName=0x7f08000a;
         public static final int action_settings=0x7f080014;
         public static final int activeArea=0x7f080012;
+        public static final int buttonDone=0x7f080008;
         public static final int cameraButton=0x7f080011;
         public static final int counter_ID=0x7f080005;
         public static final int counter_ID_label=0x7f080003;
@@ -42,13 +43,12 @@ public final class R {
         public static final int editText1=0x7f080001;
         public static final int hello_world=0x7f080000;
         public static final int lightBulbButton=0x7f080013;
-        public static final int linearLayout1=0x7f080008;
-        public static final int menu_save=0x7f080015;
+        public static final int linearLayout1=0x7f080009;
+        public static final int menu_newmeter=0x7f080015;
         public static final int meterSnapshot=0x7f080010;
         public static final int meterTakenDate=0x7f08000e;
         public static final int meterTakenTime=0x7f08000f;
         public static final int meterTakenValue=0x7f08000c;
-        public static final int newMeterButton=0x7f080009;
         public static final int recordMeter=0x7f08000d;
     }
     public static final class layout {
@@ -70,13 +70,14 @@ public final class R {
         public static final int counter_ID_label=0x7f05000e;
         public static final int counter_name_label=0x7f05000d;
         public static final int counter_type_label=0x7f05000f;
+        public static final int done=0x7f050010;
         public static final int edit_message=0x7f050007;
         public static final int hello_world=0x7f050005;
         public static final int lightSwitchText=0x7f05000a;
-        public static final int menu_done=0x7f050010;
         public static final int meterSnapshot=0x7f050009;
         public static final int meterSnapshotActiveArea=0x7f05000c;
         public static final int meterSnapshotCamera=0x7f05000b;
+        public static final int newmeter=0x7f050011;
         public static final int recordText=0x7f050008;
         public static final int title_activity_display_message=0x7f050001;
         public static final int title_activity_new_meter=0x7f050003;
