@@ -40,7 +40,7 @@
         android:layout_alignBaseline="@+id/counter_ID_label"
         android:layout_alignParentRight="true"
         android:ems="10"
-        android:inputType="textCapCharacters"
+        android:inputType="text|textCapCharacters"
         android:singleLine="true" />
 
     <EditText
@@ -51,7 +51,7 @@
         android:layout_alignParentRight="true"
         android:ems="10"
         android:gravity="end"
-        android:inputType="textCapCharacters"
+        android:inputType="text|textCapCharacters"
         android:singleLine="true"
         android:textIsSelectable="true" />
 
@@ -62,7 +62,7 @@
         android:layout_alignBaseline="@+id/counter_name_label"
         android:layout_alignParentRight="true"
         android:ems="10"
-        android:inputType="textCapCharacters"
+        android:inputType="text|textCapCharacters"
         android:singleLine="true" >
 
         <requestFocus />
