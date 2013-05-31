@@ -10,37 +10,18 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".RecordCounterActivity" >
 
-    <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/linearLayout1" >
-
-        <TextView
-            android:id="@+id/MeterName"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="none"
-            android:singleLine="true"
-            android:text="Gaszähler"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <TextView
-            android:id="@+id/MeterID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:singleLine="true"
-            android:text="...7054"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-    </LinearLayout>
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:entries="@array/initialContentListView" >
+    </ListView>
 
     <EditText
         android:id="@+id/meterTakenValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/linearLayout1"
+        android:layout_below="@+id/listView1"
         android:ems="10"
         android:gravity="end"
         android:hint="enter meter value here"
@@ -90,7 +71,6 @@
             android:contentDescription="@string/meterSnapshotActiveArea"
             android:scaleType="fitCenter"
             android:src="@drawable/activearea" />
-
     </FrameLayout>
 
 </RelativeLayout>

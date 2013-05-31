@@ -33,12 +33,10 @@ public final class R {
         public static final int img_gasmeter=0x7f020006;
     }
     public static final class id {
-        public static final int MeterID=0x7f09000b;
-        public static final int MeterName=0x7f09000a;
-        public static final int action_settings=0x7f090011;
-        public static final int activeArea=0x7f090010;
+        public static final int action_settings=0x7f09000f;
+        public static final int activeArea=0x7f09000e;
         public static final int buttonDone=0x7f090008;
-        public static final int cameraButton=0x7f09000f;
+        public static final int cameraButton=0x7f09000d;
         public static final int counter_ID=0x7f090005;
         public static final int counter_ID_label=0x7f090003;
         public static final int counter_name=0x7f090007;
@@ -47,11 +45,11 @@ public final class R {
         public static final int counter_type_label=0x7f090004;
         public static final int editText1=0x7f090001;
         public static final int hello_world=0x7f090000;
-        public static final int linearLayout1=0x7f090009;
-        public static final int menu_newmeter=0x7f090012;
-        public static final int meterSnapshot=0x7f09000e;
-        public static final int meterTakenValue=0x7f09000c;
-        public static final int recordMeter=0x7f09000d;
+        public static final int listView1=0x7f090009;
+        public static final int menu_newmeter=0x7f090010;
+        public static final int meterSnapshot=0x7f09000c;
+        public static final int meterTakenValue=0x7f09000a;
+        public static final int recordMeter=0x7f09000b;
     }
     public static final class layout {
         public static final int activity_display_message=0x7f030000;
