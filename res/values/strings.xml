@@ -13,11 +13,19 @@
     <string name="meterSnapshot">meter snapshot</string>
     <string name="lightSwitchText">Light</string>
     <string name="meterSnapshotCamera">take snapshot</string>
-    <string name="meterSnapshotActiveArea">active area</string>
+    <string name="meterSnapshotActiveArea">please bring counter into active area</string>
     <string name="counter_name_label">Meter name</string>
     <string name="counter_ID_label">Meter ID</string>
     <string name="counter_type_label">Meter type</string>
     <string name="done">Done</string>
     <string name="newmeter">New Meter</string>
-    
+
+    <string-array name="initialContentListView">
+        <item>39223,3 22.03.1972 11:14</item>
+        <item>39224,3 23.03.1972 11:14</item>
+        <item>39225,3 24.03.1972 11:14</item>
+        <item>39226,3 25.03.1972 11:14</item>
+        <item>39227,3 26.03.1972 12:15</item>
+    </string-array>
+
 </resources>

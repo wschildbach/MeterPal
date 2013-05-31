@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
 public class RecordCounterActivity extends Activity {
@@ -19,9 +18,11 @@ public class RecordCounterActivity extends Activity {
 
 		Intent intent = getIntent();
 		String counterID = intent.getStringExtra(EXTRA_MESSAGE);
-
-    	TextView name = (TextView) findViewById(R.id.MeterID);
-    	name.setText(counterID);
+		StringBuilder title = new StringBuilder("Gaszähler").append(counterID);
+		
+		setTitle(title);
+//    	TextView name = (TextView) findViewById(R.id.MeterID);
+//    	name.setText(counterID);
 	}
 
 	@Override
@@ -34,11 +35,7 @@ public class RecordCounterActivity extends Activity {
     /** Called when the user clicks the new Meter button */
     public void newMeter(View view) {     // Do something in response to button }
     	Intent intent = new Intent(this, NewMeterActivity.class);
-/*
-    	EditText editText = (EditText) findViewById(R.id.editText1);
-    	String message = editText.getText().toString();
-    	intent.putExtra(EXTRA_MESSAGE, message);
-    	*/
+
     	startActivity(intent); 
     }
 
