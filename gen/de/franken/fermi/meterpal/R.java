@@ -72,6 +72,7 @@ public final class R {
         public static final int edit_message=0x7f050007;
         public static final int hello_world=0x7f050005;
         public static final int lightSwitchText=0x7f05000a;
+        public static final int listViewDescription=0x7f050014;
         public static final int meterSnapshot=0x7f050009;
         public static final int meterSnapshotActiveArea=0x7f05000c;
         public static final int meterSnapshotCamera=0x7f05000b;

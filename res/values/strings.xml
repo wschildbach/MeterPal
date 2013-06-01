@@ -36,5 +36,6 @@
         <item>Odometer</item>
         <item>running hours</item>
     </string-array>
+        <string name="listViewDescription">Log of past measurements</string>
 
 </resources>
