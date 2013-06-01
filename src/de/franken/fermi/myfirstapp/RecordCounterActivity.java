@@ -21,7 +21,7 @@ public class RecordCounterActivity extends Activity {
 	static final class dbc {
 		private dbc() {}
 		final static String DATABASE_NAME = "counterdatabase";
-		final static int DATABASE_VERSION = 1;
+		final static int DATABASE_VERSION = 3;
 		
 		public static final class dev {
 		
@@ -57,7 +57,7 @@ public class RecordCounterActivity extends Activity {
 	         * Column name for the meter reading timestamp
 	         * <P>Type: INTEGER (long from System.curentTimeMillis())</P>
 	         */
-	        public static final String COLUMN_NAME_COUNTER_READATTIME = "read";
+	        public static final String COLUMN_NAME_COUNTER_READATTIME = "readAtTime";
 		}
 	}
 	
@@ -73,7 +73,7 @@ public class RecordCounterActivity extends Activity {
 		/**
 		 * 
 		 * Creates the underlying database with table name and column names
-		 * taken from the NotePad class.
+		 * taken from the dbc class.
 		 */
 		@Override
 		public void onCreate(SQLiteDatabase db) {
@@ -82,7 +82,7 @@ public class RecordCounterActivity extends Activity {
 			db.execSQL("CREATE TABLE " + dbc.entries.TABLE_NAME + " ("
 					+ "ID" + " INTEGER PRIMARY KEY,"
 					+ dbc.entries.COLUMN_NAME_COUNTER_ID + " INTEGER,"
-					+ dbc.entries.COLUMN_NAME_COUNTER_VALUE + " FLOAT"
+					+ dbc.entries.COLUMN_NAME_COUNTER_VALUE + " FLOAT,"
 					+ dbc.entries.COLUMN_NAME_COUNTER_READATTIME + " INTEGER"
 					+ ");");
 		
@@ -94,10 +94,10 @@ public class RecordCounterActivity extends Activity {
 					+ dbc.dev.COLUMN_NAME_METER_TYPE + " INTEGER"
 					+ ");");
 
-
 			// XXX insert two devices for debug purposes
 			ContentValues cv,cv2;
 			cv = new ContentValues();
+			cv.put("ID",0);
 			cv.put(dbc.dev.COLUMN_NAME_METER_ID, "GAS12345");
 			cv.put(dbc.dev.COLUMN_NAME_METER_TYPE, dbc.dev.METER_TYPE_GAS);
 			db.insertOrThrow(dbc.dev.TABLE_NAME, null, cv);
@@ -114,7 +114,7 @@ public class RecordCounterActivity extends Activity {
 			cv2 = new ContentValues(cv);
 			cv.put(dbc.entries.COLUMN_NAME_COUNTER_READATTIME,System.currentTimeMillis());
 			cv2.put(dbc.entries.COLUMN_NAME_COUNTER_READATTIME,System.currentTimeMillis()+1000);
-			
+
 			db.insertOrThrow(dbc.entries.TABLE_NAME, null, cv);
 			db.insertOrThrow(dbc.entries.TABLE_NAME, null, cv2);
 		}
@@ -151,20 +151,27 @@ public class RecordCounterActivity extends Activity {
         // something tries to access it, and it's only created if it doesn't already exist.
         mOpenHelper = new DatabaseHelper(getApplicationContext());
 
-        // we should not be doing this as it calls the database in the UI thread
-        fillHistoryView("1234");
-        
         // the only intent we have is to record a meter. See if we've been given
         // a meter ID that is in our database
 		Intent intent = getIntent();
+		String extra = intent.getStringExtra(EXTRA_MESSAGE);
+
+		// default
+		if (extra == null) {
+			extra = "0";
+		}
+		
 		// I think we should be catching and handling the exception here
-		Integer counterID = Integer.parseInt(intent.getStringExtra(EXTRA_MESSAGE));
+		Integer counterID = Integer.parseInt(extra);
+		String name = getCounterName(counterID);
 
-		StringBuilder title = new StringBuilder("Gaszähler").append(counterID);
+		if (name != null) {
+			setTitle(name);
+		}
 
-		setTitle(title);
-		// TextView name = (TextView) findViewById(R.id.MeterID);
-		// name.setText(counterID);
+		// we should not be doing this as it calls the database in the UI thread
+        fillHistoryView("1234");
+        
 	}
 
 	@Override
@@ -193,7 +200,18 @@ public class RecordCounterActivity extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
+	final String getCounterName(int ID)
+	{
+        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        Cursor c = db.query(true,dbc.dev.TABLE_NAME, null, "ID="+ID, null,          null,     null,   null, null);
+
+        if (!c.moveToFirst()) return null;
+        int pos = c.getColumnIndexOrThrow(dbc.dev.COLUMN_NAME_METER_ID);
+        String name = c.getString(pos);
+        return name;
+	}
+
 	final void fillHistoryView(String ID) {
 		/*
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
