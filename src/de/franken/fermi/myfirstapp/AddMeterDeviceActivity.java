@@ -7,7 +7,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 
-public class NewMeterActivity extends Activity {
+public class AddMeterDeviceActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -24,13 +24,15 @@ public class NewMeterActivity extends Activity {
 
     /** Called when the user clicks the Done button */
     public void newMeterDone(View view) {
-    	Intent intent = new Intent(this, RecordCounterActivity.class); // Call the RecordCounter intent
+//    	RecordCounterActivity.mOpenHelper.getReadableDatabase();
+
+    	Intent intent = new Intent(this, RecordDeviceReadingActivity.class); // Call the RecordCounter intent
 
     	EditText editText = (EditText) findViewById(R.id.counter_ID);
     	String message = editText.getText().toString();
-    	intent.putExtra(RecordCounterActivity.EXTRA_MESSAGE, message);
+    	intent.putExtra(RecordDeviceReadingActivity.EXTRA_MESSAGE, message);
 
-    	startActivity(intent); 
+    	startActivity(intent);
     }
 
 

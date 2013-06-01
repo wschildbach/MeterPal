@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-public class RecordCounterActivity extends Activity {
+public class RecordDeviceReadingActivity extends Activity {
 	public final static String EXTRA_MESSAGE = "de.franken.myfirstapp.recordCounterWithName";
     private static final String TAG = "RecordCounterActivity";
 
@@ -186,7 +186,7 @@ public class RecordCounterActivity extends Activity {
 		String name = getCounterName(counterID);
 		if (name == null) {
 			// create a new meter
-			intent = new Intent(this, NewMeterActivity.class);
+			intent = new Intent(this, AddMeterDeviceActivity.class);
 			startActivity(intent); // this may not return...
 		}
 		else
@@ -208,7 +208,7 @@ public class RecordCounterActivity extends Activity {
 
 	/** Called when the user clicks the new Meter button */
 	public void newMeter(View view) { // Do something in response to button }
-		Intent intent = new Intent(this, NewMeterActivity.class);
+		Intent intent = new Intent(this, AddMeterDeviceActivity.class);
 
 		startActivity(intent);
 	}
@@ -217,7 +217,7 @@ public class RecordCounterActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_newmeter:
-			Intent intent = new Intent(this, NewMeterActivity.class);
+			Intent intent = new Intent(this, AddMeterDeviceActivity.class);
 			startActivity(intent);
 			return true;
 		default:

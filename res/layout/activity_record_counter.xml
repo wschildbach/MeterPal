@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".RecordCounterActivity" >
+    tools:context=".RecordDeviceReadingActivity" >
 
     <ListView
         android:id="@+id/listView1"
@@ -45,16 +45,6 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/meterTakenValue" >
 
-        <ImageView
-            android:id="@+id/meterSnapshot"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="fill_vertical"
-            android:adjustViewBounds="false"
-            android:contentDescription="@string/meterSnapshot"
-            android:scaleType="centerCrop"
-            android:src="@drawable/img_gasmeter" />
-
         <ImageButton
             android:id="@+id/cameraButton"
             android:layout_width="wrap_content"
@@ -71,6 +61,14 @@
             android:contentDescription="@string/meterSnapshotActiveArea"
             android:scaleType="fitCenter"
             android:src="@drawable/activearea" />
+
+        <ImageButton
+            android:id="@+id/imageButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/lightSwitchText"
+            android:src="@drawable/ic_flash" />
+
     </FrameLayout>
 
 </RelativeLayout>
