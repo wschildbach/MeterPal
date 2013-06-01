@@ -21,7 +21,7 @@ public class RecordCounterActivity extends Activity {
 	static final class dbc {
 		private dbc() {}
 		final static String DATABASE_NAME = "counterdatabase";
-		final static int DATABASE_VERSION = 3;
+		final static int DATABASE_VERSION = 4;
 		
 		public static final class dev {
 		
@@ -85,7 +85,7 @@ public class RecordCounterActivity extends Activity {
 					+ dbc.entries.COLUMN_NAME_COUNTER_VALUE + " FLOAT,"
 					+ dbc.entries.COLUMN_NAME_COUNTER_READATTIME + " INTEGER"
 					+ ");");
-		
+
 			// create the table for devices
 			// I should catch an exception here
 			db.execSQL("CREATE TABLE " + dbc.dev.TABLE_NAME + " ("
@@ -97,7 +97,7 @@ public class RecordCounterActivity extends Activity {
 			// XXX insert two devices for debug purposes
 			ContentValues cv,cv2;
 			cv = new ContentValues();
-			cv.put("ID",0);
+//			cv.put("ID",0);
 			cv.put(dbc.dev.COLUMN_NAME_METER_ID, "GAS12345");
 			cv.put(dbc.dev.COLUMN_NAME_METER_TYPE, dbc.dev.METER_TYPE_GAS);
 			db.insertOrThrow(dbc.dev.TABLE_NAME, null, cv);
@@ -155,23 +155,30 @@ public class RecordCounterActivity extends Activity {
         // a meter ID that is in our database
 		Intent intent = getIntent();
 		String extra = intent.getStringExtra(EXTRA_MESSAGE);
-
+		int counterID ;
+		
 		// default
 		if (extra == null) {
-			extra = "0";
+			// XXX I think we should be catching and handling the exception here
+			counterID = getFirstCounterID();
+		} else {
+			// XXX I think we should be catching and handling the exception here
+			counterID = Integer.parseInt(extra);
 		}
-		
-		// I think we should be catching and handling the exception here
-		Integer counterID = Integer.parseInt(extra);
-		String name = getCounterName(counterID);
 
-		if (name != null) {
+		String name = getCounterName(counterID);
+		if (name == null) {
+			// create a new meter
+			intent = new Intent(this, NewMeterActivity.class);
+			startActivity(intent); // this may not return...
+		}
+		else
+		{
 			setTitle(name);
 		}
 
-		// we should not be doing this as it calls the database in the UI thread
+		// XXX we should not be doing this as it calls the database in the UI thread
         fillHistoryView("1234");
-        
 	}
 
 	@Override
@@ -199,6 +206,18 @@ public class RecordCounterActivity extends Activity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	final int getFirstCounterID()
+	{
+        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        Cursor c = db.query(true,dbc.dev.TABLE_NAME, null,    null,        null,     null,     null,   "ID", null);
+//        c = db.query     (true, table,            columns, selection, selectionArgs, groupBy, having, orderBy, limit)
+
+        // XXX not really safe as an error return
+        if (!c.moveToFirst()) return -1;
+
+        return c.getInt(c.getColumnIndexOrThrow("ID"));
 	}
 
 	final String getCounterName(int ID)
