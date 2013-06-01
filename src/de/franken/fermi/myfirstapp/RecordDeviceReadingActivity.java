@@ -1,5 +1,7 @@
 package de.franken.fermi.myfirstapp;
 
+import java.util.HashMap;
+
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,8 +15,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class RecordDeviceReadingActivity extends Activity {
@@ -36,7 +40,8 @@ public class RecordDeviceReadingActivity extends Activity {
 		final static int DATABASE_VERSION = 6;
 		
 		public static final class dev {
-		
+
+			public static HashMap<String,Integer> typeID ;
 	        /**
 	         * Column name for the unique ID
 	         * <P>Type: INTEGER</P>
@@ -61,6 +66,12 @@ public class RecordDeviceReadingActivity extends Activity {
 	         * <P>Type: INTEGER</P>
 	         */
 	        public static final String COLUMN_NAME_METER_NEXT = "order";
+
+	        private dev() {
+				typeID = new HashMap<String, Integer>();
+				typeID.put("ELECTRICITY",0);
+				typeID.put("GAS",1);
+	        }
 		}
 
 		public static final class entries {
@@ -169,12 +180,11 @@ public class RecordDeviceReadingActivity extends Activity {
     public void newMeterDone(View view) {
     	SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 
-    	TextView t ;
-
-    	t = (TextView)findViewById(R.id.counter_name);
+    	TextView t = (TextView)findViewById(R.id.counter_name);
     	mDeviceName = t.getText().toString();
-    	t = (TextView)findViewById(R.id.counter_type);
-    	int type = dbc.dev.METER_TYPE_GAS; // Integer.parseInt(t.getText().toString());
+
+    	AdapterView av = (AdapterView)findViewById(R.id.counter_type); // the spinner!
+    	long type = av.getSelectedItemId ();
 
 		ContentValues cv = new ContentValues();
 		cv.put(dbc.dev.COLUMN_NAME_METER_NAME, mDeviceName);

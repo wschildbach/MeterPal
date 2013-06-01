@@ -14,7 +14,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:text="@string/counter_name_label" />
+        android:text="@string/counter_name_label"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText
         android:id="@+id/counter_name"
@@ -22,59 +23,42 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/counter_name_label"
         android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/counter_name_label"
         android:ems="10"
         android:inputType="text"
-        android:singleLine="true" >
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceMedium" >
 
         <requestFocus />
     </EditText>
-
-    <TextView
-        android:id="@+id/counter_ID_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/counter_name_label"
-        android:layout_marginTop="10dp"
-        android:text="@string/counter_ID_label" />
-
-    <EditText
-        android:id="@+id/counter_ID"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/counter_ID_label"
-        android:layout_alignParentRight="true"
-        android:ems="10"
-        android:inputType="text"
-        android:singleLine="true" />
 
     <TextView
         android:id="@+id/counter_type_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/counter_ID_label"
+        android:layout_below="@+id/counter_name_label"
         android:layout_marginTop="10dp"
-        android:text="@string/counter_type_label" />
+        android:entries="@array/deviceTypeIdentifiers"
+        android:text="@string/counter_type_label"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <EditText
+    <Spinner
         android:id="@+id/counter_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/counter_type_label"
-        android:layout_alignParentRight="true"
-        android:ems="10"
-        android:inputType="text"
-        android:singleLine="true"
-        android:textIsSelectable="true" />
+        android:layout_alignLeft="@+id/counter_name"
+        android:layout_alignTop="@+id/counter_type_label"
+        android:entries="@array/deviceTypeIdentifiers" />
 
     <Button
         android:id="@+id/buttonDone"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/counter_type_label"
+        android:layout_alignLeft="@+id/counter_type_label"
+        android:layout_below="@+id/counter_type"
+        android:layout_marginTop="24dp"
         android:onClick="newMeterDone"
         android:text="@string/done" />
 
