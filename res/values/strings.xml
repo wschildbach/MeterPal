@@ -17,7 +17,7 @@
     <string name="counter_name_label">Meter name</string>
     <string name="counter_ID_label">Meter ID</string>
     <string name="counter_type_label">Meter type</string>
-    <string name="done">Done</string>
+    <string name="done">Submit</string>
     <string name="newmeter">New Meter</string>
 
     <string-array name="initialContentListView">
