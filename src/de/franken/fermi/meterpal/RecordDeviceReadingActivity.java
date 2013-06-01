@@ -127,17 +127,20 @@ public class RecordDeviceReadingActivity extends Activity {
 	private Long mDeviceID;
 	private String mDeviceName;
 
-	private SimpleCursorAdapter mAdapter; // XXX needs version 11 or greater
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		mOpenHelper = new DatabaseHelper(getApplicationContext());
-		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-		Cursor c = db.query(false, dbc.entries.TABLE_NAME, null, null, null, null, null, null, null);
 
-		mAdapter = new SimpleCursorAdapter(
+/*
+ * 		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+ 
+		Cursor c = db.query(false, dbc.entries.TABLE_NAME, null, null, null, null, null, null, null);
+		SimpleCursorAdapter scAdapter; // XXX needs version 11 or greater
+		
+
+		scAdapter = new SimpleCursorAdapter(
 				getApplicationContext(),
 				R.id.logEntryList,
 				c,
@@ -146,8 +149,8 @@ public class RecordDeviceReadingActivity extends Activity {
 				0);
 		setContentView(R.layout.activity_record_counter);
 		ListView lv = (ListView)findViewById(R.id.listView1);
-		lv.setAdapter(mAdapter);
-
+		lv.setAdapter(scAdapter);
+*/
 		// the only intent we have is to record a meter. See if we've been given
 		// a meter ID that is in our database
 		Intent intent = getIntent();
@@ -206,7 +209,42 @@ public class RecordDeviceReadingActivity extends Activity {
 			break;
 		case STATE_ENTER_READING:
 			setContentView(R.layout.activity_record_counter);
+			switchListView();
 			break;
+		}
+	}
+
+	private void switchListView() {
+		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+		Cursor c = db.query(false, // not unique
+				dbc.entries.TABLE_NAME, // table name
+				null, // all columns
+				dbc.entries.COLUMN_NAME_COUNTER_ID + "=" + mDeviceID, // select
+				null, // no selection args
+				null, // no groupBy
+				null, // no having
+				dbc.entries.COLUMN_NAME_COUNTER_READATTIME, // order by time
+				null); // no limit
+
+		// XXX SimpleCursorAdapter needs version 11 or greater
+		SimpleCursorAdapter scAdapter = new SimpleCursorAdapter(
+				getApplicationContext(),
+				R.id.logEntryList,
+				c,
+				new String[] {dbc.entries.COLUMN_NAME_COUNTER_READATTIME, dbc.entries.COLUMN_NAME_COUNTER_VALUE},// from
+				new int[] {R.id.logEntryDatetime,R.id.logEntryValue},// to
+				0);
+
+		// call only after setting the content view
+		ListView lv = (ListView)findViewById(R.id.listView1);
+
+		if (lv != null) {
+			Log.w(TAG, "trying to inflate header view");
+//			View v = View.inflate(getApplicationContext(), R.id.logEntryList, null);
+			Log.w(TAG, "Successfully inflated header view");
+
+//			lv.addHeaderView(v);
+			lv.setAdapter(scAdapter);
 		}
 	}
 
@@ -242,12 +280,13 @@ public class RecordDeviceReadingActivity extends Activity {
 	public void newMeterDone(View view) {
 		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 
+		// retrieve the new meter name from the UI
 		TextView t = (TextView) findViewById(R.id.counter_name);
 		mDeviceName = t.getText().toString();
 
+		// retrieve the type, as index into the spinner entries
 		AdapterView av = (AdapterView) findViewById(R.id.counter_type); // the
-																		// spinner!
-		long type = av.getSelectedItemId();
+		long type = av.getSelectedItemId();								// spinner!
 
 		ContentValues cv = new ContentValues();
 		cv.put(dbc.dev.COLUMN_NAME_METER_NAME, mDeviceName);
@@ -299,7 +338,7 @@ public class RecordDeviceReadingActivity extends Activity {
 		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 		Cursor c = db.query(true, // unique
 				dbc.dev.TABLE_NAME, // table name
-				null, // all columns
+				new String[] {dbc.dev._ID}, // only the id column
 				null, // select all
 				null, // no selection args
 				null, // no groupBy
