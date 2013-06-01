@@ -10,35 +10,29 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".RecordDeviceReadingActivity" >
 
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/topFrame" >"
-
-        <ListView
-            android:id="@+id/listView1"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_margin="4dp"
-            android:entries="@array/initialContentListView"
-            android:footerDividersEnabled="false"
-            android:headerDividersEnabled="false" >
-
-        </ListView>
-    </FrameLayout>
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@drawable/rect"
+        android:entries="@array/initialContentListView"
+        android:footerDividersEnabled="false"
+        android:headerDividersEnabled="false" >
+    </ListView>
 
     <EditText
         android:id="@+id/meterTakenValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/topFrame"
+        android:layout_below="@+id/listView1"
         android:gravity="end"
         android:hint="enter meter value here"
         android:inputType="numberDecimal"
         android:singleLine="true"
         android:text="33239.324"
-        android:textAlignment="viewEnd" />
+        android:textAlignment="viewEnd"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button
         android:id="@+id/recordMeter"
@@ -49,7 +43,8 @@
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/meterTakenValue"
         android:onClick="newReadingDone"
-        android:text="@string/recordText" />
+        android:text="@string/recordText"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <FrameLayout
         android:layout_width="match_parent"
