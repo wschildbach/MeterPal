@@ -43,6 +43,7 @@ public final class R {
         public static final int counter_type_label=0x7f090002;
         public static final int imageButton1=0x7f09000a;
         public static final int listView1=0x7f090005;
+        public static final int menu_item_share=0x7f09000d;
         public static final int menu_newmeter=0x7f09000c;
         public static final int meterTakenValue=0x7f090006;
         public static final int recordMeter=0x7f090007;
@@ -52,10 +53,8 @@ public final class R {
         public static final int activity_record_counter=0x7f030001;
     }
     public static final class menu {
-        public static final int display_message=0x7f080000;
-        public static final int main=0x7f080001;
-        public static final int new_meter=0x7f080002;
-        public static final int record_counter=0x7f080003;
+        public static final int new_meter=0x7f080000;
+        public static final int record_counter=0x7f080001;
     }
     public static final class string {
         public static final int action_settings=0x7f050004;
@@ -71,9 +70,10 @@ public final class R {
         public static final int meterSnapshot=0x7f050009;
         public static final int meterSnapshotActiveArea=0x7f05000c;
         public static final int meterSnapshotCamera=0x7f05000b;
-        public static final int newMeterName=0x7f050012;
-        public static final int newmeter=0x7f050011;
+        public static final int newMeterName=0x7f050013;
+        public static final int newmeter=0x7f050012;
         public static final int recordText=0x7f050008;
+        public static final int share=0x7f050011;
         public static final int title_activity_display_message=0x7f050001;
         public static final int title_activity_new_meter=0x7f050003;
         public static final int title_activity_record_counter=0x7f050002;

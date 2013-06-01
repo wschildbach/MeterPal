@@ -1,7 +1,9 @@
 package de.franken.fermi.myfirstapp;
 
+import java.text.DateFormat;
 import java.util.HashMap;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,6 +12,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,6 +21,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ShareActionProvider;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -37,7 +41,7 @@ public class RecordDeviceReadingActivity extends Activity {
 	static final class dbc {
 		private dbc() {}
 		final static String DATABASE_NAME = "counterdatabase";
-		final static int DATABASE_VERSION = 6;
+		final static int DATABASE_VERSION = 2;
 		
 		public static final class dev {
 
@@ -46,7 +50,7 @@ public class RecordDeviceReadingActivity extends Activity {
 	         * Column name for the unique ID
 	         * <P>Type: INTEGER</P>
 	         */
-	        public static final String _ID = "_ID";
+	        public static final String _ID = "_id";
 			public static final String TABLE_NAME = "devices";
 	        /**
 	         * Column name for the meter type
@@ -80,7 +84,7 @@ public class RecordDeviceReadingActivity extends Activity {
 	         * Column name for the unique ID
 	         * <P>Type: INTEGER</P>
 	         */
-	        public static final String _ID = "_ID";
+	        public static final String _ID = "_id";
 	        /**
 	         * Column name for the meter reading timestamp
 	         * <P>Type: INTEGER</P>
@@ -107,9 +111,10 @@ public class RecordDeviceReadingActivity extends Activity {
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_record_counter);
 
         mOpenHelper = new DatabaseHelper(getApplicationContext());
+
+		setContentView(R.layout.activity_record_counter);
 
         // the only intent we have is to record a meter. See if we've been given
         // a meter ID that is in our database
@@ -168,10 +173,25 @@ public class RecordDeviceReadingActivity extends Activity {
         }
     }
 
-    @Override
+    private ShareActionProvider mShareActionProvider;
+
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.record_counter, menu);
+
+		// Locate MenuItem with ShareActionProvider
+	    MenuItem item = menu.findItem(R.id.menu_item_share);
+
+	    // Fetch and store ShareActionProvider
+	    mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+
+	    Intent shareIntent = new Intent();
+	    shareIntent.setAction(Intent.ACTION_SEND);
+	    shareIntent.putExtra(Intent.EXTRA_TEXT, getDatabaseDump());
+	    shareIntent.setType("text/plain");
+	    mShareActionProvider.setShareIntent(shareIntent); // without this, we could stick to API level 8
 
 		return true;
 	}
@@ -246,6 +266,64 @@ public class RecordDeviceReadingActivity extends Activity {
         return c.getLong(c.getColumnIndexOrThrow(dbc.dev._ID));
 	}
 
+	private final String dumpCursorToCSV(Cursor c) {
+		StringBuilder sr = new StringBuilder();
+		Character COLSEP = ';';
+
+        if (c.moveToFirst()) {
+			int i;
+	    	for (i=0; i<c.getColumnCount(); i++) {
+	    		sr.append(c.getColumnName(i)).append(COLSEP);
+	    	}
+	    	sr.append("\n");
+	    	
+	        do {
+	        	for (i=0; i<c.getColumnCount(); i++) {
+	        		sr.append(c.getString(i)).append(COLSEP);
+	        	}
+	        	sr.append("\n");
+	        } while(c.moveToNext());
+        }
+
+		return sr.toString();
+	}
+
+	private final String getDatabaseDump() {
+		StringBuilder sr = new StringBuilder();
+		Character COLSEP = ';';
+
+		DateFormat df = DateFormat.getDateTimeInstance();
+		sr.append("database dumped on ").append(df.format(System.currentTimeMillis())).append("\n\n");
+		sr.append("database name: " + dbc.DATABASE_NAME + COLSEP + "DATABASE_VERSION " + dbc.DATABASE_VERSION + COLSEP + "\n\n");
+		
+		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        Cursor c = db.query(true, // unique
+        		dbc.dev.TABLE_NAME, // table name
+        		null, // all columns
+        		null, // select all
+        		null, // no selection args
+        		null, // no groupBy
+        		null, // no having
+        		dbc.dev._ID, // order by _ID
+        		null); // no limit
+
+        sr.append("device database\n").append(dumpCursorToCSV(c));
+
+        c = db.query(true, // unique
+        		dbc.entries.TABLE_NAME, // table name
+        		null, // all columns
+        		null, // select all
+        		null, // no selection args
+        		null, // no groupBy
+        		null, // no having
+        		dbc.dev._ID, // order by _ID
+        		null); // no limit
+
+        sr.append("\nentries database\n").append(dumpCursorToCSV(c));
+        
+        return sr.toString();
+	}
+
 	private final String getCounterName(long ID)
 	{
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
@@ -309,6 +387,7 @@ public class RecordDeviceReadingActivity extends Activity {
 					+ dbc.dev.COLUMN_NAME_METER_TYPE + " INTEGER"
 					+ ");");
 
+			/*
 			// XXX insert two devices for debug purposes
 			ContentValues cv,cv2;
 			cv = new ContentValues();
@@ -334,6 +413,7 @@ public class RecordDeviceReadingActivity extends Activity {
 
 			db.insertOrThrow(dbc.entries.TABLE_NAME, null, cv);
 			db.insertOrThrow(dbc.entries.TABLE_NAME, null, cv2);
+			*/
 		}
 
 		/**
@@ -361,7 +441,6 @@ public class RecordDeviceReadingActivity extends Activity {
 
     	ContentValues cv = new ContentValues();
 		cv.put(dbc.dev.COLUMN_NAME_METER_NAME, s);
-//		cv.put(dbc.dev.COLUMN_NAME_METER_TYPE, dbc.dev.METER_TYPE_GAS); // XXX should this be hardcoded?
 		return db.insertOrThrow(dbc.dev.TABLE_NAME, null, cv);		
 	}
 }

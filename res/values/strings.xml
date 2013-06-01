@@ -18,6 +18,7 @@
     <string name="counter_ID_label">Meter ID</string>
     <string name="counter_type_label">Meter type</string>
     <string name="done">Submit</string>
+    <string name="share">Share</string>
     <string name="newmeter">New Meter</string>
     <string name="newMeterName">New Device</string>
 
