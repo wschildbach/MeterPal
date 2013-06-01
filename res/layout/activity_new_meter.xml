@@ -13,47 +13,8 @@
         android:id="@+id/counter_name_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:text="@string/counter_name_label" />
-
-    <TextView
-        android:id="@+id/counter_ID_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/counter_name_label"
-        android:layout_below="@+id/counter_name_label"
-        android:layout_marginTop="10dp"
-        android:text="@string/counter_ID_label" />
-
-    <TextView
-        android:id="@+id/counter_type_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/counter_ID_label"
-        android:layout_below="@+id/counter_ID_label"
-        android:layout_marginTop="10dp"
-        android:text="@string/counter_type_label" />
-
-    <EditText
-        android:id="@+id/counter_ID"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/counter_ID_label"
-        android:layout_alignParentRight="true"
-        android:ems="10"
-        android:inputType="text"
-        android:singleLine="true" />
-
-    <EditText
-        android:id="@+id/counter_type"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/counter_type_label"
-        android:layout_alignParentRight="true"
-        android:ems="10"
-        android:gravity="end"
-        android:inputType="text"
-        android:singleLine="true"
-        android:textIsSelectable="true" />
 
     <EditText
         android:id="@+id/counter_name"
@@ -68,14 +29,52 @@
         <requestFocus />
     </EditText>
 
+    <TextView
+        android:id="@+id/counter_ID_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/counter_name_label"
+        android:layout_marginTop="10dp"
+        android:text="@string/counter_ID_label" />
+
+    <EditText
+        android:id="@+id/counter_ID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/counter_ID_label"
+        android:layout_alignParentRight="true"
+        android:ems="10"
+        android:inputType="text"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/counter_type_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/counter_ID_label"
+        android:layout_marginTop="10dp"
+        android:text="@string/counter_type_label" />
+
+    <EditText
+        android:id="@+id/counter_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/counter_type_label"
+        android:layout_alignParentRight="true"
+        android:ems="10"
+        android:inputType="text"
+        android:singleLine="true"
+        android:textIsSelectable="true" />
+
     <Button
         android:id="@+id/buttonDone"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/counter_type"
-        android:layout_below="@+id/counter_type"
-        android:layout_marginTop="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/counter_type_label"
         android:onClick="newMeterDone"
         android:text="@string/done" />
 
