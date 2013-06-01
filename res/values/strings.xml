@@ -19,6 +19,7 @@
     <string name="counter_type_label">Meter type</string>
     <string name="done">Submit</string>
     <string name="newmeter">New Meter</string>
+    <string name="newMeterName">New Device</string>
 
     <string-array name="initialContentListView">
         <item>39223,3 22.03.1972 11:14</item>
