@@ -74,10 +74,6 @@ public class RecordCounterActivity extends Activity {
 		
 			db.insertOrThrow(dbc.TABLE_NAME, null, cv);
 			db.insertOrThrow(dbc.TABLE_NAME, null, cv2);
-			
-/*			db.execSQL("INSERT INTO " + dbc.TABLE_NAME + "VALUES ('0','1234','12345.6','" + System.currentTimeMillis() + "')");
-			db.execSQL("INSERT INTO " + dbc.TABLE_NAME + "VALUES ('0','1234','78910.1','" + System.currentTimeMillis() + "')");
-			*/
 		}
 
 		/**
@@ -111,11 +107,15 @@ public class RecordCounterActivity extends Activity {
         // something tries to access it, and it's only created if it doesn't already exist.
         mOpenHelper = new DatabaseHelper(getApplicationContext());
 
-        // we should not be doing this
+        // we should not be doing this as it calls the database in the UI thread
         fillHistoryView("1234");
         
+        // the only intent we have is to record a meter. See if we've been given
+        // a meter ID that is in our database
 		Intent intent = getIntent();
-		String counterID = intent.getStringExtra(EXTRA_MESSAGE);
+		// I think we should be catching and handling the exception here
+		Integer counterID = Integer.parseInt(intent.getStringExtra(EXTRA_MESSAGE));
+		
 		StringBuilder title = new StringBuilder("Gaszähler").append(counterID);
 
 		setTitle(title);
