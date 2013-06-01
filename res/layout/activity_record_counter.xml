@@ -38,6 +38,7 @@
         android:layout_alignBaseline="@+id/meterTakenValue"
         android:layout_alignBottom="@+id/meterTakenValue"
         android:layout_toRightOf="@+id/meterTakenValue"
+        android:onClick="newReadingDone"
         android:text="@string/recordText" />
 
     <FrameLayout
