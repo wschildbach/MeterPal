@@ -1,4 +1,4 @@
-package de.franken.fermi.myfirstapp;
+package de.franken.fermi.meterpal;
 
 import java.text.DateFormat;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ public class RecordDeviceReadingActivity extends Activity {
 	private static final int STATE_ENTER_DEVICE = 1;
 	private int mState;
 
-	public final static String EXTRA_MESSAGE = "de.franken.myfirstapp.recordCounterWithName";
+	public final static String EXTRA_MESSAGE = "de.franken.meterpal.recordCounterWithName";
 	private static final String TAG = "RecordCounterActivity";
 
 	static final class dbc {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">MyFirstApp</string>
+    <string name="app_name">MeterPal</string>
     <string name="title_activity_display_message">My Message!!!</string>
     <string name="title_activity_record_counter">Enter Meter Reading</string>
     <string name="title_activity_new_meter">Register new Meter</string>
