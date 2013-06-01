@@ -21,23 +21,44 @@ public class RecordCounterActivity extends Activity {
 	static final class dbc {
 		private dbc() {}
 		final static String DATABASE_NAME = "counterdatabase";
-		final static int DATABASE_VERSION = 0;
-        public static final String TABLE_NAME = "entries";
-        /**
-         * Column name for the meter reading timestamp
-         * <P>Type: INTEGER</P>
-         */
-        public static final String COLUMN_NAME_COUNTER_ID = "counterID";
-        /**
-         * Column name for the value
-         * <P>Type: FLOAT</P>
-         */
-        public static final String COLUMN_NAME_COUNTER_VALUE = "value";
-        /**
-         * Column name for the meter reading timestamp
-         * <P>Type: INTEGER (long from System.curentTimeMillis())</P>
-         */
-        public static final String COLUMN_NAME_COUNTER_READATTIME = "read";
+		final static int DATABASE_VERSION = 1;
+		
+		public static final class dev {
+		
+			public static final String TABLE_NAME = "devices";
+	        /**
+	         * Column name for the meter type
+	         * <P>Type: INTEGER (0 -- EMeter, 1 -- gasMeter)</P>
+	         */
+	        public static final int METER_TYPE_ELECTRICITY = 0;
+	        public static final int METER_TYPE_GAS = 1;
+
+	        public static final String COLUMN_NAME_METER_TYPE = "meterType";
+	        /**
+	         * Column name for the meter ID -- freeform human readable identifier
+	         * <P>Type: STRING</P>
+	         */
+	        public static final String COLUMN_NAME_METER_ID = "meterID";
+		}
+
+		public static final class entries {
+			public static final String TABLE_NAME = "entries";
+	        /**
+	         * Column name for the meter reading timestamp
+	         * <P>Type: INTEGER</P>
+	         */
+	        public static final String COLUMN_NAME_COUNTER_ID = "counterID";
+	        /**
+	         * Column name for the value
+	         * <P>Type: FLOAT</P>
+	         */
+	        public static final String COLUMN_NAME_COUNTER_VALUE = "value";
+	        /**
+	         * Column name for the meter reading timestamp
+	         * <P>Type: INTEGER (long from System.curentTimeMillis())</P>
+	         */
+	        public static final String COLUMN_NAME_COUNTER_READATTIME = "read";
+		}
 	}
 	
 	static class DatabaseHelper extends SQLiteOpenHelper {
@@ -56,24 +77,46 @@ public class RecordCounterActivity extends Activity {
 		 */
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			ContentValues cv = new ContentValues();
-			
-			cv.put(dbc.COLUMN_NAME_COUNTER_ID,1234);
-			cv.put(dbc.COLUMN_NAME_COUNTER_VALUE,12345.6);
-			
-			ContentValues cv2 = new ContentValues(cv);
-			cv.put(dbc.COLUMN_NAME_COUNTER_READATTIME,System.currentTimeMillis());
-			cv2.put(dbc.COLUMN_NAME_COUNTER_READATTIME,System.currentTimeMillis()+1000);
-			
-			db.execSQL("CREATE TABLE " + dbc.TABLE_NAME + " ("
+			// create the table for meter readings
+			// I should catch an exception here
+			db.execSQL("CREATE TABLE " + dbc.entries.TABLE_NAME + " ("
 					+ "ID" + " INTEGER PRIMARY KEY,"
-					+ dbc.COLUMN_NAME_COUNTER_ID + " INTEGER,"
-					+ dbc.COLUMN_NAME_COUNTER_VALUE + " FLOAT"
-					+ dbc.COLUMN_NAME_COUNTER_READATTIME + " INTEGER,"
+					+ dbc.entries.COLUMN_NAME_COUNTER_ID + " INTEGER,"
+					+ dbc.entries.COLUMN_NAME_COUNTER_VALUE + " FLOAT"
+					+ dbc.entries.COLUMN_NAME_COUNTER_READATTIME + " INTEGER"
 					+ ");");
 		
-			db.insertOrThrow(dbc.TABLE_NAME, null, cv);
-			db.insertOrThrow(dbc.TABLE_NAME, null, cv2);
+			// create the table for devices
+			// I should catch an exception here
+			db.execSQL("CREATE TABLE " + dbc.dev.TABLE_NAME + " ("
+					+ "ID" + " INTEGER PRIMARY KEY,"
+					+ dbc.dev.COLUMN_NAME_METER_ID + " STRING,"
+					+ dbc.dev.COLUMN_NAME_METER_TYPE + " INTEGER"
+					+ ");");
+
+
+			// XXX insert two devices for debug purposes
+			ContentValues cv,cv2;
+			cv = new ContentValues();
+			cv.put(dbc.dev.COLUMN_NAME_METER_ID, "GAS12345");
+			cv.put(dbc.dev.COLUMN_NAME_METER_TYPE, dbc.dev.METER_TYPE_GAS);
+			db.insertOrThrow(dbc.dev.TABLE_NAME, null, cv);
+
+			cv = new ContentValues();
+			cv.put(dbc.dev.COLUMN_NAME_METER_ID, "ELE54321");
+			cv.put(dbc.dev.COLUMN_NAME_METER_TYPE, dbc.dev.METER_TYPE_ELECTRICITY);
+			db.insertOrThrow(dbc.dev.TABLE_NAME, null, cv);
+
+			// XXX insert two bogus readings for debug purposes
+			cv = new ContentValues();
+			cv.put(dbc.entries.COLUMN_NAME_COUNTER_ID,1234);
+			cv.put(dbc.entries.COLUMN_NAME_COUNTER_VALUE,12345.6);
+			cv2 = new ContentValues(cv);
+			cv.put(dbc.entries.COLUMN_NAME_COUNTER_READATTIME,System.currentTimeMillis());
+			cv2.put(dbc.entries.COLUMN_NAME_COUNTER_READATTIME,System.currentTimeMillis()+1000);
+			
+			db.insertOrThrow(dbc.entries.TABLE_NAME, null, cv);
+			db.insertOrThrow(dbc.entries.TABLE_NAME, null, cv2);
 		}
 
 		/**
@@ -88,7 +131,8 @@ public class RecordCounterActivity extends Activity {
 					+ newVersion + ", which will destroy all old data");
 
 			// Kills the table and existing data
-			db.execSQL("DROP TABLE IF EXISTS " + dbc.TABLE_NAME);
+			db.execSQL("DROP TABLE IF EXISTS " + dbc.entries.TABLE_NAME);
+			db.execSQL("DROP TABLE IF EXISTS " + dbc.dev.TABLE_NAME);
 
 			// Recreates the database with a new version
 			onCreate(db);
@@ -115,7 +159,7 @@ public class RecordCounterActivity extends Activity {
 		Intent intent = getIntent();
 		// I think we should be catching and handling the exception here
 		Integer counterID = Integer.parseInt(intent.getStringExtra(EXTRA_MESSAGE));
-		
+
 		StringBuilder title = new StringBuilder("Gaszähler").append(counterID);
 
 		setTitle(title);
