@@ -21,10 +21,15 @@ public class RecordCounterActivity extends Activity {
 	static final class dbc {
 		private dbc() {}
 		final static String DATABASE_NAME = "counterdatabase";
-		final static int DATABASE_VERSION = 4;
+		final static int DATABASE_VERSION = 6;
 		
 		public static final class dev {
 		
+	        /**
+	         * Column name for the unique ID
+	         * <P>Type: INTEGER</P>
+	         */
+	        public static final String _ID = "_ID";
 			public static final String TABLE_NAME = "devices";
 	        /**
 	         * Column name for the meter type
@@ -33,16 +38,26 @@ public class RecordCounterActivity extends Activity {
 	        public static final int METER_TYPE_ELECTRICITY = 0;
 	        public static final int METER_TYPE_GAS = 1;
 
-	        public static final String COLUMN_NAME_METER_TYPE = "meterType";
+	        public static final String COLUMN_NAME_METER_TYPE = "type";
 	        /**
 	         * Column name for the meter ID -- freeform human readable identifier
 	         * <P>Type: STRING</P>
 	         */
-	        public static final String COLUMN_NAME_METER_ID = "meterID";
+	        public static final String COLUMN_NAME_METER_NAME = "ID";
+	        /**
+	         * Column name for the ordering column -- for cycling through meters.
+	         * <P>Type: INTEGER</P>
+	         */
+	        public static final String COLUMN_NAME_METER_NEXT = "order";
 		}
 
 		public static final class entries {
 			public static final String TABLE_NAME = "entries";
+	        /**
+	         * Column name for the unique ID
+	         * <P>Type: INTEGER</P>
+	         */
+	        public static final String _ID = "_ID";
 	        /**
 	         * Column name for the meter reading timestamp
 	         * <P>Type: INTEGER</P>
@@ -80,7 +95,7 @@ public class RecordCounterActivity extends Activity {
 			// create the table for meter readings
 			// I should catch an exception here
 			db.execSQL("CREATE TABLE " + dbc.entries.TABLE_NAME + " ("
-					+ "ID" + " INTEGER PRIMARY KEY,"
+					+ dbc.entries._ID + " INTEGER PRIMARY KEY,"
 					+ dbc.entries.COLUMN_NAME_COUNTER_ID + " INTEGER,"
 					+ dbc.entries.COLUMN_NAME_COUNTER_VALUE + " FLOAT,"
 					+ dbc.entries.COLUMN_NAME_COUNTER_READATTIME + " INTEGER"
@@ -89,27 +104,29 @@ public class RecordCounterActivity extends Activity {
 			// create the table for devices
 			// I should catch an exception here
 			db.execSQL("CREATE TABLE " + dbc.dev.TABLE_NAME + " ("
-					+ "ID" + " INTEGER PRIMARY KEY,"
-					+ dbc.dev.COLUMN_NAME_METER_ID + " STRING,"
+					+ dbc.dev._ID + " INTEGER PRIMARY KEY,"
+					+ dbc.dev.COLUMN_NAME_METER_NAME + " STRING,"
 					+ dbc.dev.COLUMN_NAME_METER_TYPE + " INTEGER"
 					+ ");");
 
 			// XXX insert two devices for debug purposes
 			ContentValues cv,cv2;
 			cv = new ContentValues();
-//			cv.put("ID",0);
-			cv.put(dbc.dev.COLUMN_NAME_METER_ID, "GAS12345");
+			cv.put(dbc.dev._ID, 1);
+			cv.put(dbc.dev.COLUMN_NAME_METER_NAME, "GAS12345");
 			cv.put(dbc.dev.COLUMN_NAME_METER_TYPE, dbc.dev.METER_TYPE_GAS);
 			db.insertOrThrow(dbc.dev.TABLE_NAME, null, cv);
 
 			cv = new ContentValues();
-			cv.put(dbc.dev.COLUMN_NAME_METER_ID, "ELE54321");
+			cv.put(dbc.dev._ID, 2);
+			cv.put(dbc.dev.COLUMN_NAME_METER_NAME, "ELE54321");
 			cv.put(dbc.dev.COLUMN_NAME_METER_TYPE, dbc.dev.METER_TYPE_ELECTRICITY);
 			db.insertOrThrow(dbc.dev.TABLE_NAME, null, cv);
 
 			// XXX insert two bogus readings for debug purposes
+			// XXX IDs are bogus!
 			cv = new ContentValues();
-			cv.put(dbc.entries.COLUMN_NAME_COUNTER_ID,1234);
+			cv.put(dbc.entries.COLUMN_NAME_COUNTER_ID,1);
 			cv.put(dbc.entries.COLUMN_NAME_COUNTER_VALUE,12345.6);
 			cv2 = new ContentValues(cv);
 			cv.put(dbc.entries.COLUMN_NAME_COUNTER_READATTIME,System.currentTimeMillis());
@@ -140,7 +157,7 @@ public class RecordCounterActivity extends Activity {
 	}
 
     // Handle to a new DatabaseHelper.
-    private DatabaseHelper mOpenHelper;
+    public DatabaseHelper mOpenHelper;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -178,7 +195,7 @@ public class RecordCounterActivity extends Activity {
 		}
 
 		// XXX we should not be doing this as it calls the database in the UI thread
-        fillHistoryView("1234");
+        initHistoryView(counterID);
 	}
 
 	@Override
@@ -211,29 +228,31 @@ public class RecordCounterActivity extends Activity {
 	final int getFirstCounterID()
 	{
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        Cursor c = db.query(true,dbc.dev.TABLE_NAME, null,    null,        null,     null,     null,   "ID", null);
+        Cursor c = db.query(true,dbc.dev.TABLE_NAME, null,    null,        null,     null,     null,   dbc.dev._ID, null);
 //        c = db.query     (true, table,            columns, selection, selectionArgs, groupBy, having, orderBy, limit)
 
         // XXX not really safe as an error return
         if (!c.moveToFirst()) return -1;
 
-        return c.getInt(c.getColumnIndexOrThrow("ID"));
+        return c.getInt(c.getColumnIndexOrThrow(dbc.dev._ID));
 	}
 
 	final String getCounterName(int ID)
 	{
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        Cursor c = db.query(true,dbc.dev.TABLE_NAME, null, "ID="+ID, null,          null,     null,   null, null);
+        Cursor c = db.query(true,dbc.dev.TABLE_NAME, null, dbc.dev._ID+"="+ID, null,          null,     null,   null, null);
+//      c = db.query      (true, table,            columns, selection, selectionArgs, groupBy, having, orderBy, limit)
 
         if (!c.moveToFirst()) return null;
-        int pos = c.getColumnIndexOrThrow(dbc.dev.COLUMN_NAME_METER_ID);
+        int pos = c.getColumnIndexOrThrow(dbc.dev.COLUMN_NAME_METER_NAME);
         String name = c.getString(pos);
         return name;
 	}
 
-	final void fillHistoryView(String ID) {
+	final void initHistoryView(int ID) {
 		/*
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        // XXXX use dbc.dev._ID
         Cursor c = db.query(dbc.TABLE_NAME, null, "'"+dbc.COLUMN_NAME_COUNTER_ID + "'='"+ID+"'", null, null, dbc.COLUMN_NAME_COUNTER_READATTIME, null);
         ListView lv = (ListView) findViewById(R.id.listView1);
 
