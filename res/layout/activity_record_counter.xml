@@ -10,19 +10,29 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".RecordDeviceReadingActivity" >
 
-    <ListView
-        android:id="@+id/listView1"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:entries="@array/initialContentListView" >
-    </ListView>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/topFrame" >"
+
+        <ListView
+            android:id="@+id/listView1"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_margin="4dp"
+            android:entries="@array/initialContentListView"
+            android:footerDividersEnabled="false"
+            android:headerDividersEnabled="false" >
+
+        </ListView>
+    </FrameLayout>
 
     <EditText
         android:id="@+id/meterTakenValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/listView1"
-        android:ems="10"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/topFrame"
         android:gravity="end"
         android:hint="enter meter value here"
         android:inputType="numberDecimal"
@@ -36,7 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/meterTakenValue"
-        android:layout_alignBottom="@+id/meterTakenValue"
+        android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/meterTakenValue"
         android:onClick="newReadingDone"
         android:text="@string/recordText" />
@@ -69,7 +79,6 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/lightSwitchText"
             android:src="@drawable/ic_flash" />
-
     </FrameLayout>
 
 </RelativeLayout>

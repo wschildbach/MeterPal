@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ShareActionProvider;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 public class RecordDeviceReadingActivity extends Activity {
@@ -126,13 +127,26 @@ public class RecordDeviceReadingActivity extends Activity {
 	private Long mDeviceID;
 	private String mDeviceName;
 
+	private SimpleCursorAdapter mAdapter; // XXX needs version 11 or greater
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		mOpenHelper = new DatabaseHelper(getApplicationContext());
+		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+		Cursor c = db.query(false, dbc.entries.TABLE_NAME, null, null, null, null, null, null, null);
 
+		mAdapter = new SimpleCursorAdapter(
+				getApplicationContext(),
+				R.id.logEntryList,
+				c,
+				new String[] {dbc.entries.COLUMN_NAME_COUNTER_READATTIME, dbc.entries.COLUMN_NAME_COUNTER_VALUE},// from
+				new int[] {R.id.logEntryDatetime,R.id.logEntryValue},// to
+				0);
 		setContentView(R.layout.activity_record_counter);
+		ListView lv = (ListView)findViewById(R.id.listView1);
+		lv.setAdapter(mAdapter);
 
 		// the only intent we have is to record a meter. See if we've been given
 		// a meter ID that is in our database
