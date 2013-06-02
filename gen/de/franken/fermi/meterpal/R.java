@@ -47,10 +47,10 @@ public final class R {
         public static final int counter_type=0x7f090003;
         public static final int counter_type_label=0x7f090002;
         public static final int imageButton1=0x7f09000b;
-        public static final int listView1=0x7f09000c;
         public static final int logEntryDatetime=0x7f090010;
         public static final int logEntryList=0x7f09000f;
         public static final int logEntryValue=0x7f090011;
+        public static final int logView=0x7f09000c;
         public static final int menu_deldb=0x7f090014;
         public static final int menu_item_share=0x7f090015;
         public static final int menu_newmeter=0x7f090013;

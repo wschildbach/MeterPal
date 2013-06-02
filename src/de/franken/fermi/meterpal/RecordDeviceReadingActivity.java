@@ -212,7 +212,7 @@ public class RecordDeviceReadingActivity extends Activity {
 				new int[] {R.id.logEntryDatetime,R.id.logEntryValue},// to
 				0);
 
-		ListView lv = (ListView)findViewById(R.id.listView1);
+		ListView lv = (ListView)findViewById(R.id.logView);
 		lv.setAdapter(mEntryAdapter);
 	}
 
