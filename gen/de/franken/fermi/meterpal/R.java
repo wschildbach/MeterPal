@@ -34,7 +34,8 @@ public final class R {
         public static final int rect=0x7f020006;
     }
     public static final class id {
-        public static final int action_settings=0x7f09000e;
+        public static final int actionBarSpinner=0x7f09000e;
+        public static final int action_settings=0x7f09000f;
         public static final int activeArea=0x7f090009;
         public static final int buttonDone=0x7f090004;
         public static final int cameraButton=0x7f090008;
@@ -47,8 +48,8 @@ public final class R {
         public static final int logEntryDatetime=0x7f09000d;
         public static final int logEntryList=0x7f09000b;
         public static final int logEntryValue=0x7f09000c;
-        public static final int menu_item_share=0x7f090010;
-        public static final int menu_newmeter=0x7f09000f;
+        public static final int menu_item_share=0x7f090011;
+        public static final int menu_newmeter=0x7f090010;
         public static final int meterTakenValue=0x7f090006;
         public static final int recordMeter=0x7f090007;
     }
