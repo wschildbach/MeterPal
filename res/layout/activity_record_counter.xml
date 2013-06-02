@@ -1,8 +1,9 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="fill_horizontal"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -13,54 +14,49 @@
         android:id="@+id/spinner1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:entries="@array/deviceNames" >
+        android:layout_weight="1"
+        android:gravity="top|left" />
 
-    </Spinner>
-            
-    <ListView
-        android:id="@+id/listView1"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_below="@+id/spinner1"
-        android:background="@drawable/rect"
-        android:contentDescription="@string/listViewDescription"
-        android:dividerHeight="0dp"
-        android:footerDividersEnabled="false"
-        android:headerDividersEnabled="false" >
+        android:layout_height="wrap_content" >
 
-    </ListView>
+        <EditText
+            android:id="@+id/meterTakenValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:gravity="top|center_horizontal"
+            android:hint="enter meter value here"
+            android:inputType="numberDecimal"
+            android:singleLine="true"
+            android:text="33239.324"
+            android:textAlignment="viewEnd"
+            android:textAppearance="?android:attr/textAppearanceLarge" >
 
-    <EditText
-        android:id="@+id/meterTakenValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/listView1"
-        android:gravity="end"
-        android:hint="enter meter value here"
-        android:inputType="numberDecimal"
-        android:singleLine="true"
-        android:text="33239.324"
-        android:textAlignment="viewEnd"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+            <requestFocus />
+        </EditText>
 
-    <Button
-        android:id="@+id/recordMeter"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/meterTakenValue"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/meterTakenValue"
-        android:onClick="newReadingDone"
-        android:text="@string/recordText"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        <Button
+            android:id="@+id/recordMeter"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minEms="6"
+            android:onClick="newReadingDone"
+            android:text="@string/recordText"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    </LinearLayout>
 
     <FrameLayout
+        android:id="@+id/cameraFrame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/meterTakenValue" >
+        android:layout_height="280dp"
+        android:layout_below="@+id/recordMeter"
+        android:background="@drawable/rect" >
 
         <ImageButton
             android:id="@+id/cameraButton"
@@ -87,4 +83,16 @@
             android:src="@drawable/ic_flash" />
     </FrameLayout>
 
-</RelativeLayout>
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_below="@+id/cameraFrame"
+        android:layout_weight="1"
+        android:background="@drawable/rect"
+        android:contentDescription="@string/listViewDescription"
+        android:dividerHeight="0dp"
+        android:footerDividersEnabled="false"
+        android:headerDividersEnabled="false" />
+
+</LinearLayout>
