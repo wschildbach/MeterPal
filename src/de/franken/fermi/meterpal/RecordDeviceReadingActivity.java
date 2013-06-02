@@ -4,12 +4,14 @@ import java.text.DateFormat;
 import java.util.HashMap;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
@@ -22,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ShareActionProvider;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class RecordDeviceReadingActivity extends Activity {
@@ -30,10 +33,13 @@ public class RecordDeviceReadingActivity extends Activity {
 	 * existing device. ENTER_DEVICE, enter a new device into the database.
 	 */
 
+	/*
 	private static final int STATE_ENTER_READING = 0;
 	private static final int STATE_ENTER_DEVICE = 1;
 	private int mState;
-
+*/
+	
+	public final static String INTENT_ENTER_DEVICE_READING = "de.franken.meterpal.intent_enter_device_reading";
 	public final static String EXTRA_MESSAGE = "de.franken.meterpal.recordCounterWithName";
 	private static final String TAG = "RecordCounterActivity";
 
@@ -123,10 +129,12 @@ public class RecordDeviceReadingActivity extends Activity {
 	}
 
 	// Handle to a new DatabaseHelper.
-	private DatabaseHelper mOpenHelper;
+	public static DatabaseHelper mOpenHelper;
 	private Long mDeviceID;
 	private String mDeviceName;
-	private SimpleCursorAdapter mAdapter; // XXX needs version 11 or greater
+	private SimpleCursorAdapter mEntryAdapter; // XXX needs version 11 or greater
+	private SimpleCursorAdapter mDeviceAdapter;
+	private Spinner mSpinner;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -136,18 +144,6 @@ public class RecordDeviceReadingActivity extends Activity {
 		 * One-time inits
 		 */
 		mOpenHelper = new DatabaseHelper(getApplicationContext());
-
-		mAdapter = new SimpleCursorAdapter(
-				getApplicationContext(),
-				R.id.logEntryList,
-				null,
-				new String[] {dbc.entries.COLUMN_NAME_COUNTER_READATTIME, dbc.entries.COLUMN_NAME_COUNTER_VALUE},// from
-				new int[] {R.id.logEntryDatetime,R.id.logEntryValue},// to
-				0);
-
-		setContentView(R.layout.activity_record_counter);
-		ListView lv = (ListView)findViewById(R.id.listView1);
-		lv.setAdapter(mAdapter);
 
 		// the only intent we have is to record a meter. See if we've been given
 		// a meter ID that is in our database
@@ -159,8 +155,6 @@ public class RecordDeviceReadingActivity extends Activity {
 		 * the device id does not exist, pick the first available. if there is
 		 * none available, enter a new device.
 		 */
-
-		mState = STATE_ENTER_READING;
 
 		// XXX I think we should be catching and handling the exception here
 		if (extra != null) {
@@ -175,14 +169,61 @@ public class RecordDeviceReadingActivity extends Activity {
 		if (extra == null) {
 			mDeviceID = getFirstCounterID();
 			if (mDeviceID == null) {
-				Resources res = getResources();
-				mDeviceName = new String(res.getString(R.string.newMeterName));
-				mDeviceID = newDevice(mDeviceName);
-				mState = STATE_ENTER_DEVICE;
+				intent = new Intent(this, NewDeviceActivity.class); startActivity(intent);
+				// never return
 			} else {
 				mDeviceName = getCounterName(mDeviceID);
 			}
 		}
+		setContentView(R.layout.activity_record_counter);
+		setTitle(mDeviceName);
+		// add the spinner to the actionBar
+
+		/*
+		ActionBar actionBar = getActionBar();
+		mSpinner = (Spinner)getLayoutInflater().inflate(R.id.actionBarSpinner, null);
+		actionBar.setCustomView(mSpinner); // add the spinner to the action bar
+		*/
+
+		/*
+		 * to always fill the spinner with the availabel meters, set up a device adapter
+		 * and connect it to the spinner. The cursor will be set up at resume() time.
+		 */
+		mDeviceAdapter = new SimpleCursorAdapter(
+				getApplicationContext(),
+				R.layout.device_spinner,
+				null, // no cursor available yet
+				new String[] { dbc.dev.COLUMN_NAME_METER_NAME }, // from
+				new int[] {R.id.actionBarItem},// to
+				0);
+
+		mSpinner = (Spinner) findViewById(R.id.spinner1);
+		mSpinner.setAdapter(mDeviceAdapter);
+
+		/*
+		 * to always have the log updated, create an "entry adapter" and connect it to the
+		 * listview.
+		 */
+		mEntryAdapter = new SimpleCursorAdapter(
+				getApplicationContext(),
+				R.layout.reading_logview,
+				null, // no cursor available yet
+				new String[] {dbc.entries.COLUMN_NAME_COUNTER_READATTIME, dbc.entries.COLUMN_NAME_COUNTER_VALUE},// from
+				new int[] {R.id.logEntryDatetime,R.id.logEntryValue},// to
+				0);
+
+		ListView lv = (ListView)findViewById(R.id.listView1);
+		lv.setAdapter(mEntryAdapter);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		mDeviceAdapter = null;
+		mEntryAdapter = null;
+
+		mOpenHelper.close();
+		mOpenHelper = null;
 	}
 
 	/**
@@ -192,27 +233,11 @@ public class RecordDeviceReadingActivity extends Activity {
 	 * 
 	 * XXX Explain what we do here.
 	 */
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 
-		switchContentView();
-	}
-
-	private void switchContentView() {
-		setTitle(mDeviceName);
-		switch (mState) {
-		case STATE_ENTER_DEVICE:
-			setContentView(R.layout.activity_new_meter);
-			break;
-		case STATE_ENTER_READING:
-			setContentView(R.layout.activity_record_counter);
-			switchListView();
-			break;
-		}
-	}
-
-	private void switchListView() {
 		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 		Cursor c = db.query(false, // not unique
 				dbc.entries.TABLE_NAME, // table name
@@ -221,10 +246,31 @@ public class RecordDeviceReadingActivity extends Activity {
 				null, // no selection args
 				null, // no groupBy
 				null, // no having
-				dbc.entries.COLUMN_NAME_COUNTER_READATTIME, // order by time
+				dbc.entries.COLUMN_NAME_COUNTER_READATTIME + " DESC" , // order by time, latest first
 				null); // no limit
 
-		mAdapter.changeCursor(c);
+		mEntryAdapter.changeCursor(c);
+
+		c = db.query(false, // not unique
+				dbc.dev.TABLE_NAME, // table name
+				new String[] { dbc.dev._ID, dbc.dev.COLUMN_NAME_METER_NAME }, // column
+				null, // select
+				null, // no selection args
+				null, // no groupBy
+				null, // no having
+				null, // no specific order
+				null); // no limit
+
+		mDeviceAdapter.changeCursor(c);
+
+		db.close();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		mEntryAdapter.changeCursor(null);
+		mDeviceAdapter.changeCursor(null);
 	}
 
 	private ShareActionProvider mShareActionProvider;
@@ -252,31 +298,6 @@ public class RecordDeviceReadingActivity extends Activity {
 		return true;
 	}
 
-	/**
-	 * Called when the user clicks the submit button after meter data has been
-	 * entered.
-	 */
-	public void newMeterDone(View view) {
-		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-
-		// retrieve the new meter name from the UI
-		TextView t = (TextView) findViewById(R.id.counter_name);
-		mDeviceName = t.getText().toString();
-
-		// retrieve the type, as index into the spinner entries
-		AdapterView av = (AdapterView) findViewById(R.id.counter_type); // the
-		long type = av.getSelectedItemId();								// spinner!
-
-		ContentValues cv = new ContentValues();
-		cv.put(dbc.dev.COLUMN_NAME_METER_NAME, mDeviceName);
-		cv.put(dbc.dev.COLUMN_NAME_METER_TYPE, type);
-
-		db.update(dbc.dev.TABLE_NAME, cv, dbc.dev._ID + "=" + mDeviceID, null);
-
-		mState = STATE_ENTER_READING;
-		switchContentView();
-	}
-
 	public void newReadingDone(View view) {
 		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 
@@ -286,26 +307,27 @@ public class RecordDeviceReadingActivity extends Activity {
 
 		ContentValues cv = new ContentValues();
 		cv.put(dbc.entries.COLUMN_NAME_COUNTER_ID, mDeviceID);
-		cv.put(dbc.entries.COLUMN_NAME_COUNTER_READATTIME,
-				System.currentTimeMillis());
+		cv.put(dbc.entries.COLUMN_NAME_COUNTER_READATTIME,System.currentTimeMillis());
 		cv.put(dbc.entries.COLUMN_NAME_COUNTER_VALUE, value);
 
 		db.insertOrThrow(dbc.entries.TABLE_NAME, // table
 				null, // nullColumnHack
 				cv);
 		db.close();
+		mEntryAdapter.notifyDataSetChanged();
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_newmeter:
-			// XXX refactor me
-			Resources res = getResources();
-			mDeviceName = new String(res.getString(R.string.newMeterName));
-			mDeviceID = newDevice(mDeviceName);
-			mState = STATE_ENTER_DEVICE;
-			switchContentView();
+			Intent intent = new Intent(this, NewDeviceActivity.class); startActivity(intent);
+			// never return
+
+			return true;
+		case R.id.menu_deldb:
+			mOpenHelper.deleteDB();
+			intent = new Intent(this, NewDeviceActivity.class); startActivity(intent);
 
 			return true;
 		default:
@@ -334,7 +356,7 @@ public class RecordDeviceReadingActivity extends Activity {
 	private final String dumpCursorToCSV(Cursor c) {
 		StringBuilder sr = new StringBuilder();
 		Character COLSEP = ';';
-
+		
 		if (c.moveToFirst()) {
 			int i;
 			for (i = 0; i < c.getColumnCount(); i++) {
@@ -374,7 +396,11 @@ public class RecordDeviceReadingActivity extends Activity {
 				dbc.dev._ID, // order by _ID
 				null); // no limit
 
-		sr.append("device database\n").append(dumpCursorToCSV(c));
+		sr.append("device database\n");
+		
+		sr.append(DatabaseUtils.dumpCursorToString(c));
+
+		sr.append(dumpCursorToCSV(c));
 
 		c = db.query(true, // unique
 				dbc.entries.TABLE_NAME, // table name
@@ -386,7 +412,9 @@ public class RecordDeviceReadingActivity extends Activity {
 				dbc.dev._ID, // order by _ID
 				null); // no limit
 
-		sr.append("\nentries database\n").append(dumpCursorToCSV(c));
+		sr.append("\nentries database\n");
+		sr.append(DatabaseUtils.dumpCursorToString(c));
+		sr.append(dumpCursorToCSV(c));
 
 		return sr.toString();
 	}
@@ -414,6 +442,15 @@ public class RecordDeviceReadingActivity extends Activity {
 			super(context, dbc.DATABASE_NAME, null, dbc.DATABASE_VERSION);
 		}
 
+		public void deleteDB()
+		{
+			SQLiteDatabase db = getWritableDatabase();
+			db.execSQL("DROP TABLE IF EXISTS " + dbc.entries.TABLE_NAME);
+			db.execSQL("DROP TABLE IF EXISTS " + dbc.dev.TABLE_NAME);
+			onCreate(db);
+			db.close();
+		}
+
 		/**
 		 * 
 		 * Creates the underlying database with table name and column names
@@ -423,7 +460,6 @@ public class RecordDeviceReadingActivity extends Activity {
 		public void onCreate(SQLiteDatabase db) {
 			// create the table for meter readings
 			// I should catch an exception here
-			 db.disableWriteAheadLogging();
 			 db.execSQL("CREATE TABLE " + dbc.entries.TABLE_NAME + " ("
 					+ dbc.entries._ID + " INTEGER PRIMARY KEY,"
 					+ dbc.entries.COLUMN_NAME_COUNTER_ID + " INTEGER,"
@@ -437,33 +473,6 @@ public class RecordDeviceReadingActivity extends Activity {
 					+ dbc.dev._ID + " INTEGER PRIMARY KEY,"
 					+ dbc.dev.COLUMN_NAME_METER_NAME + " STRING,"
 					+ dbc.dev.COLUMN_NAME_METER_TYPE + " INTEGER" + ");");
-
-			/*
-			 * // XXX insert two devices for debug purposes ContentValues
-			 * cv,cv2; cv = new ContentValues(); cv.put(dbc.dev._ID, 1);
-			 * cv.put(dbc.dev.COLUMN_NAME_METER_NAME, "GAS12345");
-			 * cv.put(dbc.dev.COLUMN_NAME_METER_TYPE, dbc.dev.METER_TYPE_GAS);
-			 * db.insertOrThrow(dbc.dev.TABLE_NAME, null, cv);
-			 * 
-			 * cv = new ContentValues(); cv.put(dbc.dev._ID, 2);
-			 * cv.put(dbc.dev.COLUMN_NAME_METER_NAME, "ELE54321");
-			 * cv.put(dbc.dev.COLUMN_NAME_METER_TYPE,
-			 * dbc.dev.METER_TYPE_ELECTRICITY);
-			 * db.insertOrThrow(dbc.dev.TABLE_NAME, null, cv);
-			 * 
-			 * // XXX insert two bogus readings for debug purposes // XXX IDs
-			 * are bogus! cv = new ContentValues();
-			 * cv.put(dbc.entries.COLUMN_NAME_COUNTER_ID,1);
-			 * cv.put(dbc.entries.COLUMN_NAME_COUNTER_VALUE,12345.6); cv2 = new
-			 * ContentValues(cv);
-			 * cv.put(dbc.entries.COLUMN_NAME_COUNTER_READATTIME
-			 * ,System.currentTimeMillis());
-			 * cv2.put(dbc.entries.COLUMN_NAME_COUNTER_READATTIME
-			 * ,System.currentTimeMillis()+1000);
-			 * 
-			 * db.insertOrThrow(dbc.entries.TABLE_NAME, null, cv);
-			 * db.insertOrThrow(dbc.entries.TABLE_NAME, null, cv2);
-			 */
 		}
 
 		/**
@@ -484,13 +493,5 @@ public class RecordDeviceReadingActivity extends Activity {
 			// Recreates the database with a new version
 			onCreate(db);
 		}
-	}
-
-	private long newDevice(String s) {
-		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-
-		ContentValues cv = new ContentValues();
-		cv.put(dbc.dev.COLUMN_NAME_METER_NAME, s);
-		return db.insertOrThrow(dbc.dev.TABLE_NAME, null, cv);
 	}
 }

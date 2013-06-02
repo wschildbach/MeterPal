@@ -9,10 +9,20 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".RecordDeviceReadingActivity" >
 
+    <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:entries="@array/deviceNames" >
+
+    </Spinner>
+            
     <ListView
         android:id="@+id/listView1"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:layout_below="@+id/spinner1"
         android:background="@drawable/rect"
         android:contentDescription="@string/listViewDescription"
         android:dividerHeight="0dp"

@@ -9,6 +9,7 @@ package de.franken.fermi.meterpal;
 
 public final class R {
     public static final class array {
+        public static final int deviceNames=0x7f060002;
         public static final int deviceTypeIdentifiers=0x7f060001;
         public static final int initialContentListView=0x7f060000;
     }
@@ -34,32 +35,36 @@ public final class R {
         public static final int rect=0x7f020006;
     }
     public static final class id {
-        public static final int actionBarSpinner=0x7f09000e;
-        public static final int action_settings=0x7f09000f;
-        public static final int activeArea=0x7f090009;
-        public static final int buttonDone=0x7f090004;
-        public static final int cameraButton=0x7f090008;
+        public static final int actionBarItem=0x7f09000d;
+        public static final int actionBarSpinnerLayout=0x7f09000c;
+        public static final int action_settings=0x7f090011;
+        public static final int activeArea=0x7f09000a;
+        public static final int buttonSubmit=0x7f090004;
+        public static final int cameraButton=0x7f090009;
         public static final int counter_name=0x7f090001;
         public static final int counter_name_label=0x7f090000;
         public static final int counter_type=0x7f090003;
         public static final int counter_type_label=0x7f090002;
-        public static final int imageButton1=0x7f09000a;
-        public static final int listView1=0x7f090005;
-        public static final int logEntryDatetime=0x7f09000d;
-        public static final int logEntryList=0x7f09000b;
-        public static final int logEntryValue=0x7f09000c;
-        public static final int menu_item_share=0x7f090011;
-        public static final int menu_newmeter=0x7f090010;
-        public static final int meterTakenValue=0x7f090006;
-        public static final int recordMeter=0x7f090007;
+        public static final int imageButton1=0x7f09000b;
+        public static final int listView1=0x7f090006;
+        public static final int logEntryDatetime=0x7f09000f;
+        public static final int logEntryList=0x7f09000e;
+        public static final int logEntryValue=0x7f090010;
+        public static final int menu_deldb=0x7f090013;
+        public static final int menu_item_share=0x7f090014;
+        public static final int menu_newmeter=0x7f090012;
+        public static final int meterTakenValue=0x7f090007;
+        public static final int recordMeter=0x7f090008;
+        public static final int spinner1=0x7f090005;
     }
     public static final class layout {
-        public static final int activity_new_meter=0x7f030000;
+        public static final int activity_new_device=0x7f030000;
         public static final int activity_record_counter=0x7f030001;
-        public static final int layout_elements=0x7f030002;
+        public static final int device_spinner=0x7f030002;
+        public static final int reading_logview=0x7f030003;
     }
     public static final class menu {
-        public static final int new_meter=0x7f080000;
+        public static final int new_device=0x7f080000;
         public static final int record_counter=0x7f080001;
     }
     public static final class string {
@@ -69,6 +74,7 @@ public final class R {
         public static final int counter_ID_label=0x7f05000e;
         public static final int counter_name_label=0x7f05000d;
         public static final int counter_type_label=0x7f05000f;
+        public static final int deleteDB=0x7f050016;
         public static final int done=0x7f050010;
         public static final int edit_message=0x7f050007;
         public static final int hello_world=0x7f050005;
@@ -82,6 +88,7 @@ public final class R {
         public static final int recordText=0x7f050008;
         public static final int share=0x7f050011;
         public static final int title_activity_display_message=0x7f050001;
+        public static final int title_activity_new_device=0x7f050015;
         public static final int title_activity_new_meter=0x7f050003;
         public static final int title_activity_record_counter=0x7f050002;
     }

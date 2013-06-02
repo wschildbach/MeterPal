@@ -36,6 +36,14 @@
         <item>Odometer</item>
         <item>running hours</item>
     </string-array>
-        <string name="listViewDescription">Log of past measurements</string>
+    <string-array name="deviceNames">
+        <item>DevA</item>
+        <item>DevB</item>
+        <item>DevC</item>
+    </string-array>
+
+    <string name="listViewDescription">Log of past measurements</string>
+    <string name="title_activity_new_device">NewDeviceActivity</string>
+    <string name="deleteDB">Delete DB</string>
 
 </resources>
