@@ -132,6 +132,9 @@ public class RecordDeviceReadingActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		/*
+		 * One-time inits
+		 */
 		mOpenHelper = new DatabaseHelper(getApplicationContext());
 
 		mAdapter = new SimpleCursorAdapter(
