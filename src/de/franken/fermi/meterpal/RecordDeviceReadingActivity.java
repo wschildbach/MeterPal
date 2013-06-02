@@ -19,13 +19,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ListView;
 import android.widget.ShareActionProvider;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class RecordDeviceReadingActivity extends Activity {
+public class RecordDeviceReadingActivity extends Activity implements OnItemSelectedListener {
 	/*
 	 * the activity can have two states: ENTER_READING, enters a reading on an
 	 * existing device. ENTER_DEVICE, enter a new device into the database.
@@ -174,7 +176,7 @@ public class RecordDeviceReadingActivity extends Activity {
 			}
 		}
 		setContentView(R.layout.activity_record_counter);
-		setTitle(mDeviceName);
+
 		// add the spinner to the actionBar
 
 		/*
@@ -197,6 +199,7 @@ public class RecordDeviceReadingActivity extends Activity {
 
 		mSpinner = (Spinner) findViewById(R.id.spinner1);
 		mSpinner.setAdapter(mDeviceAdapter);
+		mSpinner.setOnItemSelectedListener(this);
 
 		/*
 		 * to always have the log updated, create an "entry adapter" and connect it to the
@@ -237,19 +240,9 @@ public class RecordDeviceReadingActivity extends Activity {
 		super.onResume();
 
 		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+		onDeviceIDChanged();
+
 		Cursor c = db.query(false, // not unique
-				dbc.entries.TABLE_NAME, // table name
-				null, // all columns
-				dbc.entries.COLUMN_NAME_COUNTER_ID + "=" + mDeviceID, // select
-				null, // no selection args
-				null, // no groupBy
-				null, // no having
-				dbc.entries.COLUMN_NAME_COUNTER_READATTIME + " DESC" , // order by time, latest first
-				null); // no limit
-
-		mEntryAdapter.changeCursor(c);
-
-		c = db.query(false, // not unique
 				dbc.dev.TABLE_NAME, // table name
 				new String[] { dbc.dev._ID, dbc.dev.COLUMN_NAME_METER_NAME }, // column
 				null, // select
@@ -262,6 +255,24 @@ public class RecordDeviceReadingActivity extends Activity {
 		mDeviceAdapter.changeCursor(c);
 
 		db.close();
+	}
+
+	private void onDeviceIDChanged() {
+		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+		Cursor c = db.query(false, // not unique
+				dbc.entries.TABLE_NAME, // table name
+				null, // all columns
+				dbc.entries.COLUMN_NAME_COUNTER_ID + "=" + mDeviceID, // select
+				null, // no selection args
+				null, // no groupBy
+				null, // no having
+				dbc.entries.COLUMN_NAME_COUNTER_READATTIME + " DESC" , // order by time, latest first
+				null); // no limit
+
+		mEntryAdapter.changeCursor(c);
+		// read new device name
+		mDeviceName = getCounterName(mDeviceID);
+		setTitle(mDeviceName);
 	}
 
 	@Override
@@ -296,7 +307,22 @@ public class RecordDeviceReadingActivity extends Activity {
 		return true;
 	}
 
-	public void newReadingDone(View view) {
+	/*
+	 * OnItemSelectedListener methods
+	 */
+    public void onItemSelected(AdapterView<?> parent, View view, 
+            int pos, long id) {
+        // An item was selected. You can retrieve the selected item using
+        // parent.getItemAtPosition(pos)
+    	mDeviceID = Long.valueOf(parent.getItemIdAtPosition(pos));
+    	onDeviceIDChanged();
+    }
+
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+    }
+
+    public void newReadingDone(View view) {
 		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 
 		TextView t;
