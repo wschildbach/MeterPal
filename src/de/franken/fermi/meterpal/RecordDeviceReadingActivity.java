@@ -177,14 +177,6 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		}
 		setContentView(R.layout.activity_record_counter);
 
-		// add the spinner to the actionBar
-
-		/*
-		ActionBar actionBar = getActionBar();
-		mSpinner = (Spinner)getLayoutInflater().inflate(R.id.actionBarSpinner, null);
-		actionBar.setCustomView(mSpinner); // add the spinner to the action bar
-		*/
-
 		/*
 		 * to always fill the spinner with the availabel meters, set up a device adapter
 		 * and connect it to the spinner. The cursor will be set up at resume() time.
@@ -197,7 +189,14 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 				new int[] {R.id.actionBarItem},// to
 				0);
 
-		mSpinner = (Spinner) findViewById(R.id.spinner1);
+		// add the spinner to the actionBar
+
+		mSpinner = (Spinner)getLayoutInflater().inflate(R.layout.action_bar_spinner, null);
+		ActionBar actionBar = getActionBar();
+		actionBar.setCustomView(mSpinner); // add the spinner to the action bar
+		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM|ActionBar.DISPLAY_USE_LOGO);
+
+		//mSpinner = (Spinner) findViewById(R.id.spinner1);
 		mSpinner.setAdapter(mDeviceAdapter);
 		mSpinner.setOnItemSelectedListener(this);
 
@@ -272,7 +271,7 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		mEntryAdapter.changeCursor(c);
 		// read new device name
 		mDeviceName = getCounterName(mDeviceID);
-		setTitle(mDeviceName);
+//		setTitle(mDeviceName);
 	}
 
 	@Override
