@@ -126,6 +126,7 @@ public class RecordDeviceReadingActivity extends Activity {
 	private DatabaseHelper mOpenHelper;
 	private Long mDeviceID;
 	private String mDeviceName;
+	private SimpleCursorAdapter mAdapter; // XXX needs version 11 or greater
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -133,24 +134,18 @@ public class RecordDeviceReadingActivity extends Activity {
 
 		mOpenHelper = new DatabaseHelper(getApplicationContext());
 
-/*
- * 		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
- 
-		Cursor c = db.query(false, dbc.entries.TABLE_NAME, null, null, null, null, null, null, null);
-		SimpleCursorAdapter scAdapter; // XXX needs version 11 or greater
-		
-
-		scAdapter = new SimpleCursorAdapter(
+		mAdapter = new SimpleCursorAdapter(
 				getApplicationContext(),
 				R.id.logEntryList,
-				c,
+				null,
 				new String[] {dbc.entries.COLUMN_NAME_COUNTER_READATTIME, dbc.entries.COLUMN_NAME_COUNTER_VALUE},// from
 				new int[] {R.id.logEntryDatetime,R.id.logEntryValue},// to
 				0);
+
 		setContentView(R.layout.activity_record_counter);
 		ListView lv = (ListView)findViewById(R.id.listView1);
-		lv.setAdapter(scAdapter);
-*/
+		lv.setAdapter(mAdapter);
+
 		// the only intent we have is to record a meter. See if we've been given
 		// a meter ID that is in our database
 		Intent intent = getIntent();
@@ -226,26 +221,7 @@ public class RecordDeviceReadingActivity extends Activity {
 				dbc.entries.COLUMN_NAME_COUNTER_READATTIME, // order by time
 				null); // no limit
 
-		// XXX SimpleCursorAdapter needs version 11 or greater
-		SimpleCursorAdapter scAdapter = new SimpleCursorAdapter(
-				getApplicationContext(),
-				R.id.logEntryList,
-				c,
-				new String[] {dbc.entries.COLUMN_NAME_COUNTER_READATTIME, dbc.entries.COLUMN_NAME_COUNTER_VALUE},// from
-				new int[] {R.id.logEntryDatetime,R.id.logEntryValue},// to
-				0);
-
-		// call only after setting the content view
-		ListView lv = (ListView)findViewById(R.id.listView1);
-
-		if (lv != null) {
-			Log.w(TAG, "trying to inflate header view");
-//			View v = View.inflate(getApplicationContext(), R.id.logEntryList, null);
-			Log.w(TAG, "Successfully inflated header view");
-
-//			lv.addHeaderView(v);
-			lv.setAdapter(scAdapter);
-		}
+		mAdapter.changeCursor(c);
 	}
 
 	private ShareActionProvider mShareActionProvider;
@@ -424,24 +400,6 @@ public class RecordDeviceReadingActivity extends Activity {
 		int pos = c.getColumnIndexOrThrow(dbc.dev.COLUMN_NAME_METER_NAME);
 		String name = c.getString(pos);
 		return name;
-	}
-
-	final void initHistoryView(int ID) {
-		/*
-		 * SQLiteDatabase db = mOpenHelper.getReadableDatabase(); // XXXX use
-		 * dbc.dev._ID Cursor c = db.query(dbc.TABLE_NAME, null,
-		 * "'"+dbc.COLUMN_NAME_COUNTER_ID + "'='"+ID+"'", null, null,
-		 * dbc.COLUMN_NAME_COUNTER_READATTIME, null); ListView lv = (ListView)
-		 * findViewById(R.id.listView1);
-		 * 
-		 * if (!c.moveToFirst()) return ;
-		 * 
-		 * int posVal = c.getColumnIndexOrThrow(dbc.COLUMN_NAME_COUNTER_VALUE);
-		 * int posTime =
-		 * c.getColumnIndexOrThrow(dbc.COLUMN_NAME_COUNTER_READATTIME); do {
-		 * long time = c.getLong(posTime); float val = c.getFloat(posVal); }
-		 * while (c.moveToNext());
-		 */
 	}
 
 	static class DatabaseHelper extends SQLiteOpenHelper {
