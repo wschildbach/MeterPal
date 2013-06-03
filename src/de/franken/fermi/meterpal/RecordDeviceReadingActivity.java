@@ -3,9 +3,12 @@ package de.franken.fermi.meterpal;
 import java.text.DateFormat;
 import java.util.HashMap;
 
+import de.franken.fermi.meterpal.DatabaseHelper.mySQLiteOpenHelper;
+
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Application;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -43,93 +46,8 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 	public final static String EXTRA_MESSAGE = "de.franken.meterpal.recordCounterWithName";
 	private static final String TAG = "RecordCounterActivity";
 
-	static final class dbc {
-		private dbc() {
-		}
-
-		final static String DATABASE_NAME = "counterdatabase";
-		final static int DATABASE_VERSION = 2;
-
-		public static final class dev {
-
-			public static HashMap<String, Integer> typeID;
-			/**
-			 * Column name for the unique ID
-			 * <P>
-			 * Type: INTEGER
-			 * </P>
-			 */
-			public static final String _ID = "_id";
-			public static final String TABLE_NAME = "devices";
-			/**
-			 * Column name for the meter type
-			 * <P>
-			 * Type: INTEGER (0 -- EMeter, 1 -- gasMeter)
-			 * </P>
-			 */
-			public static final int METER_TYPE_ELECTRICITY = 0;
-			public static final int METER_TYPE_GAS = 1;
-
-			public static final String COLUMN_NAME_METER_TYPE = "type";
-			/**
-			 * Column name for the meter ID -- freeform human readable
-			 * identifier
-			 * <P>
-			 * Type: STRING
-			 * </P>
-			 */
-			public static final String COLUMN_NAME_METER_NAME = "ID";
-			/**
-			 * Column name for the ordering column -- for cycling through
-			 * meters.
-			 * <P>
-			 * Type: INTEGER
-			 * </P>
-			 */
-			public static final String COLUMN_NAME_METER_NEXT = "order";
-
-			private dev() {
-				typeID = new HashMap<String, Integer>();
-				typeID.put("ELECTRICITY", 0);
-				typeID.put("GAS", 1);
-			}
-		}
-
-		public static final class entries {
-			public static final String TABLE_NAME = "entries";
-			/**
-			 * Column name for the unique ID
-			 * <P>
-			 * Type: INTEGER
-			 * </P>
-			 */
-			public static final String _ID = "_id";
-			/**
-			 * Column name for the meter reading timestamp
-			 * <P>
-			 * Type: INTEGER
-			 * </P>
-			 */
-			public static final String COLUMN_NAME_COUNTER_ID = "counterID";
-			/**
-			 * Column name for the value
-			 * <P>
-			 * Type: FLOAT
-			 * </P>
-			 */
-			public static final String COLUMN_NAME_COUNTER_VALUE = "value";
-			/**
-			 * Column name for the meter reading timestamp
-			 * <P>
-			 * Type: INTEGER (long from System.curentTimeMillis())
-			 * </P>
-			 */
-			public static final String COLUMN_NAME_COUNTER_READATTIME = "readAtTime";
-		}
-	}
-
 	// Handle to a new DatabaseHelper.
-	public static DatabaseHelper mOpenHelper;
+	private mySQLiteOpenHelper mOpenHelper;
 	private Long mDeviceID;
 	private String mDeviceName;
 	private SimpleCursorAdapter mEntryAdapter; // XXX needs version 11 or greater
@@ -141,9 +59,11 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		super.onCreate(savedInstanceState);
 
 		/*
-		 * One-time inits
+		 * The DatabaseHelper is an object that is a singleton within this Application.
+		 * We can thus refer to it from here.
 		 */
-		mOpenHelper = new DatabaseHelper(getApplicationContext());
+	    DatabaseHelper dbh = ((DatabaseHelper)getApplicationContext());
+		mOpenHelper = (mySQLiteOpenHelper)dbh.getSQLiteOpenHelper();
 
 		// the only intent we have is to record a meter. See if we've been given
 		// a meter ID that is in our database
@@ -185,7 +105,7 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 				getApplicationContext(),
 				R.layout.device_spinner,
 				null, // no cursor available yet
-				new String[] { dbc.dev.COLUMN_NAME_METER_NAME }, // from
+				new String[] { DatabaseHelper.dbc.dev.COLUMN_NAME_METER_NAME }, // from
 				new int[] {R.id.actionBarItem},// to
 				0);
 
@@ -208,7 +128,7 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 				getApplicationContext(),
 				R.layout.reading_logview,
 				null, // no cursor available yet
-				new String[] {dbc.entries.COLUMN_NAME_COUNTER_READATTIME, dbc.entries.COLUMN_NAME_COUNTER_VALUE},// from
+				new String[] {DatabaseHelper.dbc.entries.COLUMN_NAME_COUNTER_READATTIME, DatabaseHelper.dbc.entries.COLUMN_NAME_COUNTER_VALUE},// from
 				new int[] {R.id.logEntryDatetime,R.id.logEntryValue},// to
 				0);
 
@@ -221,9 +141,6 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		super.onDestroy();
 		mDeviceAdapter = null;
 		mEntryAdapter = null;
-
-		mOpenHelper.close();
-		mOpenHelper = null;
 	}
 
 	/**
@@ -242,8 +159,8 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		onDeviceIDChanged();
 
 		Cursor c = db.query(false, // not unique
-				dbc.dev.TABLE_NAME, // table name
-				new String[] { dbc.dev._ID, dbc.dev.COLUMN_NAME_METER_NAME }, // column
+				DatabaseHelper.dbc.dev.TABLE_NAME, // table name
+				new String[] { DatabaseHelper.dbc.dev._ID, DatabaseHelper.dbc.dev.COLUMN_NAME_METER_NAME }, // column
 				null, // select
 				null, // no selection args
 				null, // no groupBy
@@ -259,13 +176,13 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 	private void onDeviceIDChanged() {
 		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 		Cursor c = db.query(false, // not unique
-				dbc.entries.TABLE_NAME, // table name
+				DatabaseHelper.dbc.entries.TABLE_NAME, // table name
 				null, // all columns
-				dbc.entries.COLUMN_NAME_COUNTER_ID + "=" + mDeviceID, // select
+				DatabaseHelper.dbc.entries.COLUMN_NAME_COUNTER_ID + "=" + mDeviceID, // select
 				null, // no selection args
 				null, // no groupBy
 				null, // no having
-				dbc.entries.COLUMN_NAME_COUNTER_READATTIME + " DESC" , // order by time, latest first
+				DatabaseHelper.dbc.entries.COLUMN_NAME_COUNTER_READATTIME + " DESC" , // order by time, latest first
 				null); // no limit
 
 		mEntryAdapter.changeCursor(c);
@@ -295,6 +212,7 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		// Fetch and store ShareActionProvider
 		mShareActionProvider = (ShareActionProvider) item.getActionProvider();
 
+		/*
 		Intent shareIntent = new Intent();
 		shareIntent.setAction(Intent.ACTION_SEND);
 		shareIntent.putExtra(Intent.EXTRA_TEXT, getDatabaseDump());
@@ -302,7 +220,7 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		mShareActionProvider.setShareIntent(shareIntent); // without this, we
 															// could stick to
 															// API level 8
-
+		 */
 		return true;
 	}
 
@@ -329,11 +247,11 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		double value = Double.parseDouble(t.getText().toString());
 
 		ContentValues cv = new ContentValues();
-		cv.put(dbc.entries.COLUMN_NAME_COUNTER_ID, mDeviceID);
-		cv.put(dbc.entries.COLUMN_NAME_COUNTER_READATTIME,System.currentTimeMillis());
-		cv.put(dbc.entries.COLUMN_NAME_COUNTER_VALUE, value);
+		cv.put(DatabaseHelper.dbc.entries.COLUMN_NAME_COUNTER_ID, mDeviceID);
+		cv.put(DatabaseHelper.dbc.entries.COLUMN_NAME_COUNTER_READATTIME,System.currentTimeMillis());
+		cv.put(DatabaseHelper.dbc.entries.COLUMN_NAME_COUNTER_VALUE, value);
 
-		db.insertOrThrow(dbc.entries.TABLE_NAME, // table
+		db.insertOrThrow(DatabaseHelper.dbc.entries.TABLE_NAME, // table
 				null, // nullColumnHack
 				cv);
 		db.close();
@@ -361,160 +279,34 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 	private final Long getFirstCounterID() {
 		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 		Cursor c = db.query(true, // unique
-				dbc.dev.TABLE_NAME, // table name
-				new String[] {dbc.dev._ID}, // only the id column
+				DatabaseHelper.dbc.dev.TABLE_NAME, // table name
+				new String[] {DatabaseHelper.dbc.dev._ID}, // only the id column
 				null, // select all
 				null, // no selection args
 				null, // no groupBy
 				null, // no having
-				dbc.dev._ID, // order by _ID
+				DatabaseHelper.dbc.dev._ID, // order by _ID
 				null); // no limit
 
 		if (!c.moveToFirst())
 			return null;
 
-		return c.getLong(c.getColumnIndexOrThrow(dbc.dev._ID));
-	}
-
-	private final String dumpCursorToCSV(Cursor c) {
-		StringBuilder sr = new StringBuilder();
-		Character COLSEP = ';';
-		
-		if (c.moveToFirst()) {
-			int i;
-			for (i = 0; i < c.getColumnCount(); i++) {
-				sr.append(c.getColumnName(i)).append(COLSEP);
-			}
-			sr.append("\n");
-
-			do {
-				for (i = 0; i < c.getColumnCount(); i++) {
-					sr.append(c.getString(i)).append(COLSEP);
-				}
-				sr.append("\n");
-			} while (c.moveToNext());
-		}
-
-		return sr.toString();
-	}
-
-	private final String getDatabaseDump() {
-		StringBuilder sr = new StringBuilder();
-		Character COLSEP = ';';
-
-		DateFormat df = DateFormat.getDateTimeInstance();
-		sr.append("database dumped on ")
-				.append(df.format(System.currentTimeMillis())).append("\n\n");
-		sr.append("database name: " + dbc.DATABASE_NAME + COLSEP
-				+ "DATABASE_VERSION " + dbc.DATABASE_VERSION + COLSEP + "\n\n");
-
-		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-		Cursor c = db.query(true, // unique
-				dbc.dev.TABLE_NAME, // table name
-				null, // all columns
-				null, // select all
-				null, // no selection args
-				null, // no groupBy
-				null, // no having
-				dbc.dev._ID, // order by _ID
-				null); // no limit
-
-		sr.append("device database\n");
-		
-		sr.append(DatabaseUtils.dumpCursorToString(c));
-
-		sr.append(dumpCursorToCSV(c));
-
-		c = db.query(true, // unique
-				dbc.entries.TABLE_NAME, // table name
-				null, // all columns
-				null, // select all
-				null, // no selection args
-				null, // no groupBy
-				null, // no having
-				dbc.dev._ID, // order by _ID
-				null); // no limit
-
-		sr.append("\nentries database\n");
-		sr.append(DatabaseUtils.dumpCursorToString(c));
-		sr.append(dumpCursorToCSV(c));
-
-		return sr.toString();
+		return c.getLong(c.getColumnIndexOrThrow(DatabaseHelper.dbc.dev._ID));
 	}
 
 	private final String getCounterName(long ID) {
 		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-		Cursor c = db.query(true, dbc.dev.TABLE_NAME, null, dbc.dev._ID + "="
+		Cursor c = db.query(true, DatabaseHelper.dbc.dev.TABLE_NAME, null, DatabaseHelper.dbc.dev._ID + "="
 				+ ID, null, null, null, null, null);
 		// c = db.query (true, table, columns, selection, selectionArgs,
 		// groupBy, having, orderBy, limit)
 
 		if (!c.moveToFirst())
 			return null;
-		int pos = c.getColumnIndexOrThrow(dbc.dev.COLUMN_NAME_METER_NAME);
+		int pos = c.getColumnIndexOrThrow(DatabaseHelper.dbc.dev.COLUMN_NAME_METER_NAME);
 		String name = c.getString(pos);
 		return name;
 	}
 
-	static class DatabaseHelper extends SQLiteOpenHelper {
-
-		DatabaseHelper(Context context) {
-
-			// calls the super constructor, requesting the default cursor
-			// factory.
-			super(context, dbc.DATABASE_NAME, null, dbc.DATABASE_VERSION);
-		}
-
-		public void deleteDB()
-		{
-			SQLiteDatabase db = getWritableDatabase();
-			db.execSQL("DROP TABLE IF EXISTS " + dbc.entries.TABLE_NAME);
-			db.execSQL("DROP TABLE IF EXISTS " + dbc.dev.TABLE_NAME);
-			onCreate(db);
-			db.close();
-		}
-
-		/**
-		 * 
-		 * Creates the underlying database with table name and column names
-		 * taken from the dbc class.
-		 */
-		@Override
-		public void onCreate(SQLiteDatabase db) {
-			// create the table for meter readings
-			// I should catch an exception here
-			 db.execSQL("CREATE TABLE " + dbc.entries.TABLE_NAME + " ("
-					+ dbc.entries._ID + " INTEGER PRIMARY KEY,"
-					+ dbc.entries.COLUMN_NAME_COUNTER_ID + " INTEGER,"
-					+ dbc.entries.COLUMN_NAME_COUNTER_VALUE + " FLOAT,"
-					+ dbc.entries.COLUMN_NAME_COUNTER_READATTIME + " INTEGER"
-					+ ");");
-
-			// create the table for devices
-			// I should catch an exception here
-			db.execSQL("CREATE TABLE " + dbc.dev.TABLE_NAME + " ("
-					+ dbc.dev._ID + " INTEGER PRIMARY KEY,"
-					+ dbc.dev.COLUMN_NAME_METER_NAME + " STRING,"
-					+ dbc.dev.COLUMN_NAME_METER_TYPE + " INTEGER" + ");");
-		}
-
-		/**
-		 * 
-		 * Called whenever the version changes.
-		 */
-		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-			// Logs that the database is being upgraded
-			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-					+ newVersion + ", which will destroy all old data");
-
-			// Kills the table and existing data
-			db.execSQL("DROP TABLE IF EXISTS " + dbc.entries.TABLE_NAME);
-			db.execSQL("DROP TABLE IF EXISTS " + dbc.dev.TABLE_NAME);
-
-			// Recreates the database with a new version
-			onCreate(db);
-		}
-	}
 }
+

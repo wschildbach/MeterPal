@@ -1,6 +1,6 @@
 package de.franken.fermi.meterpal;
 
-import de.franken.fermi.meterpal.RecordDeviceReadingActivity.dbc;
+import de.franken.fermi.meterpal.DatabaseHelper.mySQLiteOpenHelper;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.ContentValues;
@@ -16,23 +16,9 @@ public class NewDeviceActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.activity_new_device);
 	}
-
-	/*
-	SQLiteDatabase mDb ;
-	@Override
-	protected void onResume()
-	{
-		// XXX catch (SQLiteException e) {
-	}
-
-	@Override
-	protected void onPause() {
-		
-		mDb.close();
-	}
-	*/
 
 	/**
 	 * Called when the user clicks the submit button after meter data has been
@@ -40,7 +26,14 @@ public class NewDeviceActivity extends Activity {
 	 */
 
 	public void onSubmit(View v) {
-		SQLiteDatabase db = RecordDeviceReadingActivity.mOpenHelper.getWritableDatabase();
+		/*
+		 * The DatabaseHelper is an object that is a singleton within this Application.
+		 * We can thus refer to it from here.
+		 */
+	    DatabaseHelper dbh = ((DatabaseHelper)getApplicationContext());
+	    mySQLiteOpenHelper openHelper = (mySQLiteOpenHelper)dbh.getSQLiteOpenHelper();
+		SQLiteDatabase db = openHelper.getWritableDatabase();
+
 		// retrieve the new meter name from the UI
 		TextView t = (TextView) findViewById(R.id.counter_name);
 		String name = t.getText().toString();
@@ -50,10 +43,10 @@ public class NewDeviceActivity extends Activity {
 		long type = av.getSelectedItemId();								// spinner!
 
 		ContentValues cv = new ContentValues();
-		cv.put(dbc.dev.COLUMN_NAME_METER_NAME, name);
-		cv.put(dbc.dev.COLUMN_NAME_METER_TYPE, type);
+		cv.put(DatabaseHelper.dbc.dev.COLUMN_NAME_METER_NAME, name);
+		cv.put(DatabaseHelper.dbc.dev.COLUMN_NAME_METER_TYPE, type);
 
-		Long deviceID = db.insertOrThrow(dbc.dev.TABLE_NAME, null, cv); // XXX catch me
+		Long deviceID = db.insertOrThrow(DatabaseHelper.dbc.dev.TABLE_NAME, null, cv); // XXX catch me
 		db.close(); // this closes all instances of the database (even in the calling Activity)
 
 		// add new created device ID as extra
