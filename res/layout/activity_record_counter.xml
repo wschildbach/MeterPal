@@ -12,6 +12,33 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rect" >
+
+        <ImageButton
+            android:id="@+id/previousDevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onPreviousDeviceClicked"
+            android:src="@android:drawable/ic_media_previous" />
+
+        <Spinner
+            android:id="@+id/deviceSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/nextDevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onNextDeviceClicked"
+            android:src="@android:drawable/ic_media_next" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
         <EditText
@@ -48,6 +75,7 @@
         android:layout_width="match_parent"
         android:layout_height="280dp"
         android:layout_below="@+id/recordMeter"
+        android:layout_weight="1"
         android:background="@drawable/rect" >
 
         <ImageButton
@@ -78,9 +106,9 @@
     <ListView
         android:id="@+id/logView"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="70dp"
         android:layout_below="@+id/cameraFrame"
-        android:layout_weight="1"
+        android:layout_weight="0"
         android:background="@drawable/rect"
         android:contentDescription="@string/listViewDescription"
         android:dividerHeight="0dp"

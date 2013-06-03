@@ -16,7 +16,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDoneException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -55,7 +57,6 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 	private String mDeviceName;
 	private SimpleCursorAdapter mEntryAdapter; // XXX needs version 11 or greater
 	private SimpleCursorAdapter mDeviceAdapter;
-	private Spinner mSpinner;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -113,19 +114,12 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 				new int[] {R.id.actionBarItem},// to
 				0);
 
-		// add the spinner to the actionBar
-
-		mSpinner = (Spinner)getLayoutInflater().inflate(R.layout.action_bar_spinner, null);
-		ActionBar actionBar = getActionBar();
-		actionBar.setCustomView(mSpinner); // add the spinner to the action bar
-		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM|ActionBar.DISPLAY_USE_LOGO);
-
-		//mSpinner = (Spinner) findViewById(R.id.spinner1);
-		mSpinner.setAdapter(mDeviceAdapter);
-		mSpinner.setOnItemSelectedListener(this);
+		Spinner spinner = (Spinner) findViewById(R.id.deviceSpinner);
+		spinner.setAdapter(mDeviceAdapter);
+		spinner.setOnItemSelectedListener(this);
 
 		/*
-		 * to always have the log updated, create an "entry adapter" and connect it to the
+		 * to have the log update from the database, create an "entry adapter" and connect it to the
 		 * listview.
 		 */
 		mEntryAdapter = new SimpleCursorAdapter(
@@ -147,14 +141,6 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		mDeviceAdapter = null;
 		mEntryAdapter = null;
 	}
-
-	/**
-	 * This method is called when the Activity is about to come to the
-	 * foreground. This happens when the Activity comes to the top of the task
-	 * stack, OR when it is first starting.
-	 * 
-	 * XXX Explain what we do here.
-	 */
 
 	@Override
 	protected void onResume() {
@@ -187,11 +173,17 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 				null); // no limit
 
 		mEntryAdapter.changeCursor(c);
-		// read new device name
-		mDeviceName = getCounterName(mDeviceID);
-//		setTitle(mDeviceName);
-		EditText et = (EditText)findViewById(id.meterTakenValue);
 
+		/*
+		 * display selected device as title
+		 */
+		mDeviceName = getCounterName(mDeviceID);
+		setTitle(mDeviceName);
+
+		/*
+		 * set the last meter reading as default
+		 */
+		EditText et = (EditText)findViewById(id.meterTakenValue);
 		et.setText(getLastMeterValue(mDeviceID).toString());
 	}
 
@@ -239,10 +231,20 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
     	onDeviceIDChanged();
     }
 
-    public void onNothingSelected(AdapterView<?> parent) {
-        // Another interface callback
+    public void onNothingSelected(AdapterView<?> parent) { }
+
+    public void onNextDeviceClicked(View v)
+    {
+    	mDeviceID = nextDeviceID(mDeviceID);
+    	onDeviceIDChanged();
     }
 
+    public void onPreviousDeviceClicked(View v)
+    {
+    	mDeviceID = previousDeviceID(mDeviceID);
+    	onDeviceIDChanged();
+    }
+    
     public void newReadingDone(View view) {
 		TextView t;
 		t = (TextView) findViewById(R.id.meterTakenValue);
@@ -257,7 +259,7 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 				null, // nullColumnHack
 				cv);
 
-		mEntryAdapter.notifyDataSetChanged(); // this does not do what I think it would...
+		onDeviceIDChanged();
 	}
 
 	@Override
@@ -276,6 +278,45 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private Long nextDeviceID(long id)
+	{
+		return seekDeviceID(id,+1);
+	}
+
+	private Long previousDeviceID(long id)
+	{
+		return seekDeviceID(id,-1);
+	}
+
+	private Long seekDeviceID(long id, int dir)
+	{
+		SQLiteStatement stmta = db.compileStatement("SELECT "+DatabaseHelper.dbc.dev._ID+" FROM "+DatabaseHelper.dbc.dev.TABLE_NAME+" WHERE "+DatabaseHelper.dbc.dev._ID+" > ? ORDER BY "+DatabaseHelper.dbc.dev._ID+" ASC LIMIT 1");
+		SQLiteStatement stmtd = db.compileStatement("SELECT "+DatabaseHelper.dbc.dev._ID+" FROM "+DatabaseHelper.dbc.dev.TABLE_NAME+" WHERE "+DatabaseHelper.dbc.dev._ID+" < ? ORDER BY "+DatabaseHelper.dbc.dev._ID+" DESC LIMIT 1");
+		SQLiteStatement stmt ;
+		
+		switch(dir) {
+		case +1:
+			stmt = stmta;
+			break;
+		case -1:
+			stmt = stmtd;
+			break;
+		default:
+			stmt = null;
+		}
+		
+		try {
+			stmt.bindLong(1,id);
+			id = stmt.simpleQueryForLong();
+		}
+		catch (SQLiteDoneException e) {
+			stmt.bindLong(1,-id*10000); // XXX hack hack!!!
+			id = stmt.simpleQueryForLong();
+		}
+
+		return Long.valueOf(id);
 	}
 
 	private final Long getFirstCounterID() {
