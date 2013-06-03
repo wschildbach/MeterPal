@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.util.HashMap;
 
 import de.franken.fermi.meterpal.DatabaseHelper.mySQLiteOpenHelper;
+import de.franken.fermi.meterpal.R.id;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -24,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ShareActionProvider;
 import android.widget.SimpleCursorAdapter;
@@ -48,6 +50,7 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 
 	// Handle to a new DatabaseHelper.
 	private mySQLiteOpenHelper mOpenHelper;
+	private SQLiteDatabase db ;
 	private Long mDeviceID;
 	private String mDeviceName;
 	private SimpleCursorAdapter mEntryAdapter; // XXX needs version 11 or greater
@@ -64,6 +67,7 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		 */
 	    DatabaseHelper dbh = ((DatabaseHelper)getApplicationContext());
 		mOpenHelper = (mySQLiteOpenHelper)dbh.getSQLiteOpenHelper();
+		db = mOpenHelper.getWritableDatabase();
 
 		// the only intent we have is to record a meter. See if we've been given
 		// a meter ID that is in our database
@@ -139,6 +143,7 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		db.close();
 		mDeviceAdapter = null;
 		mEntryAdapter = null;
 	}
@@ -155,7 +160,6 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 	protected void onResume() {
 		super.onResume();
 
-		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 		onDeviceIDChanged();
 
 		Cursor c = db.query(false, // not unique
@@ -169,12 +173,9 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 				null); // no limit
 
 		mDeviceAdapter.changeCursor(c);
-
-		db.close();
 	}
 
 	private void onDeviceIDChanged() {
-		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 		Cursor c = db.query(false, // not unique
 				DatabaseHelper.dbc.entries.TABLE_NAME, // table name
 				null, // all columns
@@ -189,6 +190,9 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		// read new device name
 		mDeviceName = getCounterName(mDeviceID);
 //		setTitle(mDeviceName);
+		EditText et = (EditText)findViewById(id.meterTakenValue);
+
+		et.setText(getLastMeterValue(mDeviceID).toString());
 	}
 
 	@Override
@@ -240,8 +244,6 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
     }
 
     public void newReadingDone(View view) {
-		SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-
 		TextView t;
 		t = (TextView) findViewById(R.id.meterTakenValue);
 		double value = Double.parseDouble(t.getText().toString());
@@ -254,8 +256,8 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		db.insertOrThrow(DatabaseHelper.dbc.entries.TABLE_NAME, // table
 				null, // nullColumnHack
 				cv);
-		db.close();
-		mEntryAdapter.notifyDataSetChanged();
+
+		mEntryAdapter.notifyDataSetChanged(); // this does not do what I think it would...
 	}
 
 	@Override
@@ -277,7 +279,6 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 	}
 
 	private final Long getFirstCounterID() {
-		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
 		Cursor c = db.query(true, // unique
 				DatabaseHelper.dbc.dev.TABLE_NAME, // table name
 				new String[] {DatabaseHelper.dbc.dev._ID}, // only the id column
@@ -288,25 +289,45 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 				DatabaseHelper.dbc.dev._ID, // order by _ID
 				null); // no limit
 
-		if (!c.moveToFirst())
-			return null;
+		Long rv = null;
+		if (c.moveToFirst()) {
+			rv = c.getLong(0);
+		}
 
-		return c.getLong(c.getColumnIndexOrThrow(DatabaseHelper.dbc.dev._ID));
+		return rv ;
 	}
 
 	private final String getCounterName(long ID) {
-		SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-		Cursor c = db.query(true, DatabaseHelper.dbc.dev.TABLE_NAME, null, DatabaseHelper.dbc.dev._ID + "="
+		Cursor c = db.query(true, DatabaseHelper.dbc.dev.TABLE_NAME, new String[] {DatabaseHelper.dbc.dev.COLUMN_NAME_METER_NAME}, DatabaseHelper.dbc.dev._ID + "="
 				+ ID, null, null, null, null, null);
 		// c = db.query (true, table, columns, selection, selectionArgs,
 		// groupBy, having, orderBy, limit)
 
-		if (!c.moveToFirst())
-			return null;
-		int pos = c.getColumnIndexOrThrow(DatabaseHelper.dbc.dev.COLUMN_NAME_METER_NAME);
-		String name = c.getString(pos);
+		String name = null ;
+		if (c.moveToFirst()) {
+			name = c.getString(0);
+		}
+
 		return name;
 	}
 
+	private Double getLastMeterValue(long ID) {		
+		Cursor c = db.query(true, // unique
+				DatabaseHelper.dbc.entries.TABLE_NAME, // table name
+				new String[] {DatabaseHelper.dbc.entries.COLUMN_NAME_COUNTER_VALUE}, // only the value
+				DatabaseHelper.dbc.entries.COLUMN_NAME_COUNTER_ID + "=" + ID, // select entries just for this device
+				null, // no selection args
+				null, // no groupBy
+				null, // no having
+				DatabaseHelper.dbc.entries.COLUMN_NAME_COUNTER_READATTIME + " DESC", // order by timestamp, last first
+				"1"); // and return the first
+	
+		Double rv = null ;
+		if (c.moveToFirst()) {
+			rv = c.getDouble(0);
+		}
+
+		return rv ;
+	}
 }
 
