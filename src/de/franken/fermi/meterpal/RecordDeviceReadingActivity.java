@@ -312,7 +312,7 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 			id = stmt.simpleQueryForLong();
 		}
 		catch (SQLiteDoneException e) {
-			stmt.bindLong(1,-id*10000); // XXX hack hack!!!
+			stmt.bindLong(1,-dir*10000); // XXX hack hack!!!
 			id = stmt.simpleQueryForLong();
 		}
 
