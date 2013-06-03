@@ -1,13 +1,11 @@
 package de.franken.fermi.meterpal;
 
 import java.text.DateFormat;
-import java.util.HashMap;
 
 import de.franken.fermi.meterpal.DatabaseHelper.mySQLiteOpenHelper;
 import de.franken.fermi.meterpal.R.id;
 
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
