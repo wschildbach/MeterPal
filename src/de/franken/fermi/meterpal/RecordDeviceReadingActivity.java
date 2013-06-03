@@ -9,15 +9,11 @@ import de.franken.fermi.meterpal.R.id;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Application;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDoneException;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,6 +53,7 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 	private String mDeviceName;
 	private SimpleCursorAdapter mEntryAdapter; // XXX needs version 11 or greater
 	private SimpleCursorAdapter mDeviceAdapter;
+	private Intent mShareIntent;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -208,15 +205,12 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		// Fetch and store ShareActionProvider
 		mShareActionProvider = (ShareActionProvider) item.getActionProvider();
 
-		/*
-		Intent shareIntent = new Intent();
-		shareIntent.setAction(Intent.ACTION_SEND);
-		shareIntent.putExtra(Intent.EXTRA_TEXT, getDatabaseDump());
-		shareIntent.setType("text/plain");
-		mShareActionProvider.setShareIntent(shareIntent); // without this, we
-															// could stick to
-															// API level 8
-		 */
+		mShareIntent = new Intent();
+		mShareIntent.setAction(Intent.ACTION_SEND);
+		mShareIntent.setType("text/plain");
+		mShareIntent.putExtra(Intent.EXTRA_TEXT, mOpenHelper.getDatabaseDump());
+		mShareActionProvider.setShareIntent(mShareIntent); // without this, we could stick to API level 8
+
 		return true;
 	}
 
@@ -260,6 +254,12 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 				cv);
 
 		onDeviceIDChanged();
+
+		/*
+		 * update the sharing intent.
+		 */
+		mShareIntent.removeExtra(Intent.EXTRA_TEXT);
+		mShareIntent.putExtra(Intent.EXTRA_TEXT, mOpenHelper.getDatabaseDump());
 	}
 
 	@Override

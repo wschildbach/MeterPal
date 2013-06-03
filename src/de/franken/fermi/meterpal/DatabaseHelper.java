@@ -88,7 +88,7 @@ public class DatabaseHelper extends Application {
 
 			sr.append("device database\n");
 			
-			sr.append(DatabaseUtils.dumpCursorToString(c));
+//			sr.append(DatabaseUtils.dumpCursorToString(c));
 
 			sr.append(dumpCursorToCSV(c));
 
@@ -103,7 +103,7 @@ public class DatabaseHelper extends Application {
 					null); // no limit
 
 			sr.append("\nentries database\n");
-			sr.append(DatabaseUtils.dumpCursorToString(c));
+	//		sr.append(DatabaseUtils.dumpCursorToString(c));
 			sr.append(dumpCursorToCSV(c));
 
 			return sr.toString();
@@ -120,12 +120,12 @@ public class DatabaseHelper extends Application {
 				}
 				sr.append("\n");
 
-				while (!c.isAfterLast()) {
+				do {
 					for (i = 0; i < c.getColumnCount(); i++) {
 						sr.append(c.getString(i)).append(COLSEP);
 					}
 					sr.append("\n");
-				}
+				} while(c.moveToNext());
 			}
 
 			return sr.toString();
