@@ -203,8 +203,13 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		 * set the last meter reading as default
 		 */
 		EditText et = (EditText)findViewById(id.meterTakenValue);
-        double val = getLastMeterValue(mDeviceID);
-		et.setText(String.format("%06.4f", val));
+
+		Double val = getLastMeterValue(mDeviceID);
+		if (val != null) {
+			et.setText(String.format("%06.4f", val));
+		} else {
+			et.setText(null);
+		}
 	}
 
 	@Override
