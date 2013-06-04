@@ -1,6 +1,7 @@
 package de.franken.fermi.meterpal;
 
 import java.text.DateFormat;
+import java.util.Date;
 
 import de.franken.fermi.meterpal.DatabaseHelper.mySQLiteOpenHelper;
 import de.franken.fermi.meterpal.R.id;
@@ -127,6 +128,29 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 
 		ListView lv = (ListView)findViewById(R.id.logView);
 		lv.setAdapter(mEntryAdapter);
+		
+		mEntryAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+		    @Override
+		    public boolean setViewValue(View view, Cursor cursor, int index) {
+		    	if (index == cursor.getColumnIndex(DatabaseHelper.dbc.entries.COLUMN_NAME_COUNTER_READATTIME)) {
+		            // get a locale based string for the date
+		            DateFormat dateFormatter = android.text.format.DateFormat
+		                    .getDateFormat(getApplicationContext()),
+		                    timeFormatter =  android.text.format.DateFormat
+				                    .getTimeFormat(getApplicationContext());
+		            long date = cursor.getLong(index);
+		            Date dateObj = new Date(date);
+		            ((TextView) view).setText(dateFormatter.format(dateObj) + " " + timeFormatter.format(dateObj));
+		            return true;
+		    	} else if (index == cursor.getColumnIndex(DatabaseHelper.dbc.entries.COLUMN_NAME_COUNTER_VALUE)) {
+		            double val = cursor.getDouble(index);
+		            ((TextView) view).setText(String.format("%06.4f", val));
+		            return true;
+		    	} else {
+		            return false;
+		        }
+		    }
+		});
 	}
 
 	@Override
@@ -179,7 +203,8 @@ public class RecordDeviceReadingActivity extends Activity implements OnItemSelec
 		 * set the last meter reading as default
 		 */
 		EditText et = (EditText)findViewById(id.meterTakenValue);
-		et.setText(getLastMeterValue(mDeviceID).toString());
+        double val = getLastMeterValue(mDeviceID);
+		et.setText(String.format("%06.4f", val));
 	}
 
 	@Override
